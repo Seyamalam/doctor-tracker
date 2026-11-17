@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { api } from "@/lib/api";
-import { authClient } from "@/lib/auth-client";
 
 import { DoctorView, DoctorViewSkeleton } from "./doctor-view";
 
@@ -28,16 +26,6 @@ export const generateMetadata = async ({
 
 const DoctorPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
-  const session = await authClient.getSession({
-    fetchOptions: {
-      headers: await headers(),
-      throw: true,
-    },
-  });
-
-  if (!session?.user) {
-    redirect("/login");
-  }
 
   return (
     <Suspense fallback={<DoctorViewSkeleton />}>

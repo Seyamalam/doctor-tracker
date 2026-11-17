@@ -26,6 +26,18 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
     },
   });
 
+  if (
+    res.status === 401 &&
+    typeof window !== "undefined" &&
+    !window.location.pathname.startsWith("/login")
+  ) {
+    void fetch(`${BASE_URL}/api/auth/sign-out`, {
+      credentials: "include",
+      method: "POST",
+    });
+    window.location.assign("/login");
+  }
+
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as {
       error?: string;
