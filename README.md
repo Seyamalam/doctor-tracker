@@ -22,6 +22,9 @@ A secure admin app for managing doctors and their patients. Sign in with email/p
 - **Doctor detail** — doctor card plus their patient roster with the same filter/search/pagination controls.
 - **Patients** — list with search (name/condition), condition and doctor filters, sort, pagination; each row embeds its doctor and links to the detail page; create/edit/delete with doctor reassignment.
 - **Dashboard** — totals (doctors, patients, new this month), 30-day activity chart, top-5 conditions pie, busiest specializations, recent patients.
+- **Global search** — `⌘K`/`Ctrl+K` command palette plus a top search bar: debounced search across doctors, patients and pages, keyboard navigable.
+- **Collapsible sidebar** — `B` toggles a collapsed icon rail, `D` switches theme; drawer navigation on mobile.
+- **CSV export** — every table exports its current search/filter/sort view.
 - **Responsive + accessible** — tables scroll safely on mobile, coarse-pointer touch targets, focus-visible rings, `prefers-reduced-motion` support, dark mode.
 - **SEO** — full `Metadata` API coverage (per-page titles, dynamic doctor titles), generated Open Graph + Twitter card images, `robots.txt`, `sitemap.xml`, theme colour + viewport config.
 - **Hardened API** — helmet security headers, gzip compression, rate limiting (`/api/auth` 200/15min, `/api` 1000/15min), 100kb JSON body cap, centralized error/404 handling, graceful shutdown on SIGTERM/SIGINT.
