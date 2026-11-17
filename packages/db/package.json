@@ -6,7 +6,8 @@
     "./*": "./src/*.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "seed": "tsx src/seed.ts"
   },
   "dependencies": {
     "mongoose": "^9.12.1",
@@ -14,6 +15,7 @@
   },
   "devDependencies": {
     "@doctor-tracker/config": "*",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "varlock": "1.25.0"
   }
