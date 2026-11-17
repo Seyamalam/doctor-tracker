@@ -24,6 +24,10 @@ const doctorSchema = new Schema(
       trim: true,
       type: String,
     },
+    patientCount: {
+      default: 0,
+      type: Number,
+    },
     phone: {
       required: true,
       type: String,
@@ -41,6 +45,7 @@ const doctorSchema = new Schema(
 );
 
 doctorSchema.index({ name: 1 });
+doctorSchema.index({ patientCount: -1 });
 doctorSchema.index({ specialization: 1 });
 doctorSchema.index({ createdAt: -1 });
 doctorSchema.index({ hospital: "text", name: "text", specialization: "text" });

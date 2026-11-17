@@ -241,6 +241,7 @@ const buildDoctors = (now: number) => {
       hospital: pick(HOSPITALS),
       id: new mongoose.Types.ObjectId().toString(),
       name,
+      patientCount: 0,
       phone: phone(),
       specialization: pick(SPECIALIZATIONS),
       updatedAt: createdAt,
@@ -255,6 +256,7 @@ interface DoctorSeed {
   hospital: string;
   id: string;
   name: string;
+  patientCount: number;
   phone: string;
   specialization: string;
   updatedAt: Date;
@@ -264,6 +266,7 @@ const buildPatients = (doctors: DoctorSeed[], now: number) => {
   const patients = [];
   for (let index = 0; index < PATIENT_COUNT; index += 1) {
     const doctor = doctors[Math.floor(rand() * doctors.length)] as DoctorSeed;
+    doctor.patientCount += 1;
     const createdAt = new Date(now - rand() * PATIENT_SPREAD_DAYS * DAY_MS);
     patients.push({
       condition: pickWeighted(CONDITIONS, CONDITION_WEIGHTS),

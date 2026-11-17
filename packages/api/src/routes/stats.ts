@@ -53,20 +53,9 @@ statsRouter.get(
           specialization: string;
         }>([
           {
-            $lookup: {
-              as: "patients",
-              from: "patient",
-              let: { doctorId: "$id" },
-              pipeline: [
-                { $match: { $expr: { $eq: ["$doctorId", "$$doctorId"] } } },
-                { $count: "count" },
-              ],
-            },
-          },
-          {
             $project: {
               _id: 0,
-              count: { $ifNull: [{ $first: "$patients.count" }, 0] },
+              count: { $ifNull: ["$patientCount", 0] },
               doctorId: "$id",
               name: 1,
               specialization: 1,

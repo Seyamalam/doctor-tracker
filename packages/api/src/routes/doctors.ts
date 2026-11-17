@@ -75,14 +75,15 @@ interface DoctorItem {
 }
 
 const doctorProjectStage = {
-  $project: { __v: 0, _id: 0, patients: 0 },
+  $project: { __v: 0, _id: 0 },
 };
 
 const toDoctorItem = async (doc: Record<string, unknown>): Promise<DoctorItem> => {
   const { _id, __v, ...rest } = doc;
-  const item = rest as Omit<DoctorItem, "patientCount">;
-  const patientCount = await Patient.countDocuments({ doctorId: item.id });
-  return { ...item, patientCount };
+  return {
+    ...(rest as Omit<DoctorItem, "patientCount">),
+    patientCount: (doc.patientCount as number) ?? 0,
+  };
 };
 
 export const doctorsRouter = Router();
@@ -126,26 +127,7 @@ doctorsRouter.get(
       limit,
       model: Doctor,
       page,
-      stages: [
-        { $match: match },
-        {
-          $lookup: {
-            as: "patients",
-            from: "patient",
-            let: { doctorId: "$id" },
-            pipeline: [
-              { $match: { $expr: { $eq: ["$doctorId", "$$doctorId"] } } },
-              { $count: "count" },
-            ],
-          },
-        },
-        {
-          $addFields: {
-            patientCount: { $ifNull: [{ $first: "$patients.count" }, 0] },
-          },
-        },
-        { $sort: parseSort(sort) },
-      ],
+      stages: [{ $match: match }, { $sort: parseSort(sort) }],
     });
 
     res.json(result);

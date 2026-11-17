@@ -99,6 +99,18 @@ export const seedDoctor = async (index = 0, overrides: Record<string, unknown> =
 export const seedDoctors = (docs: ReturnType<typeof makeDoctor>[]) =>
   Doctor.insertMany(docs, { timestamps: false });
 
+const bumpPatientCounts = async (doctorIds: string[]) => {
+  const counts = new Map<string, number>();
+  for (const id of doctorIds) {
+    counts.set(id, (counts.get(id) ?? 0) + 1);
+  }
+  await Doctor.bulkWrite(
+    [...counts].map(([id, count]) => ({
+      updateOne: { filter: { id }, update: { $inc: { patientCount: count } } },
+    })),
+  );
+};
+
 export const seedPatient = async (
   index: number,
   doctorId: string,
@@ -106,8 +118,11 @@ export const seedPatient = async (
 ) => {
   const doc = makePatient(index, doctorId, overrides);
   await Patient.insertMany([doc], { timestamps: false });
+  await bumpPatientCounts([doctorId]);
   return doc;
 };
 
-export const seedPatients = (docs: ReturnType<typeof makePatient>[]) =>
-  Patient.insertMany(docs, { timestamps: false });
+export const seedPatients = async (docs: ReturnType<typeof makePatient>[]) => {
+  await Patient.insertMany(docs, { timestamps: false });
+  await bumpPatientCounts(docs.map((doc) => doc.doctorId));
+};

@@ -135,6 +135,7 @@ patientsRouter.post(
       return;
     }
     const created = await Patient.create(parsed.data);
+    await Doctor.updateOne({ id: parsed.data.doctorId }, { $inc: { patientCount: 1 } });
     const { _id, __v, ...doc } = created.toObject();
     res.status(201).json({ ...doc, doctor });
   }),
@@ -174,8 +175,10 @@ patientsRouter.patch(
       sendValidationError(res, parsed.error);
       return;
     }
-    const exists = await Patient.exists({ id: params.data.id });
-    if (!exists) {
+    const current = await Patient.findOne({ id: params.data.id })
+      .select("-_id doctorId")
+      .lean<{ doctorId: string }>();
+    if (!current) {
       res.status(404).json({ error: "Patient not found" });
       return;
     }
@@ -193,6 +196,22 @@ patientsRouter.patch(
     )
       .select("-_id -__v")
       .lean<PatientDoc>();
+    if (parsed.data.doctorId !== undefined && parsed.data.doctorId !== current.doctorId) {
+      await Doctor.bulkWrite([
+        {
+          updateOne: {
+            filter: { id: current.doctorId },
+            update: { $inc: { patientCount: -1 } },
+          },
+        },
+        {
+          updateOne: {
+            filter: { id: parsed.data.doctorId },
+            update: { $inc: { patientCount: 1 } },
+          },
+        },
+      ]);
+    }
     const doctor = await findEmbeddedDoctor(doc?.doctorId ?? "");
     res.json({ ...doc, doctor });
   }),
@@ -207,11 +226,14 @@ patientsRouter.delete(
       sendValidationError(res, params.error);
       return;
     }
-    const result = await Patient.deleteOne({ id: params.data.id });
-    if (result.deletedCount === 0) {
+    const deleted = await Patient.findOneAndDelete({ id: params.data.id })
+      .select("-_id doctorId")
+      .lean<{ doctorId: string }>();
+    if (!deleted) {
       res.status(404).json({ error: "Patient not found" });
       return;
     }
+    await Doctor.updateOne({ id: deleted.doctorId }, { $inc: { patientCount: -1 } });
     res.status(204).end();
   }),
 );
