@@ -51,6 +51,7 @@ const GlobalNotFound = () => (
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-3">
+          {/* oxlint-disable-next-line nextjs/no-html-link-for-pages -- global-not-found has no router context; a hard navigation re-runs the proxy gate */}
           <a
             className={cx(
               btn.primary,
@@ -61,6 +62,7 @@ const GlobalNotFound = () => (
             Go to the console
             <ArrowRight aria-hidden="true" className="h-4 w-4" />
           </a>
+          {/* oxlint-disable-next-line nextjs/no-html-link-for-pages -- hard navigation: no router context on this page */}
           <a
             className={cx(
               btn.ghost,
