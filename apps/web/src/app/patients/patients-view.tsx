@@ -23,7 +23,11 @@ import { api } from "@/lib/api";
 import { downloadCsv, EXPORT_PAGE_SIZE, fetchAllPages } from "@/lib/csv";
 import { formatDate } from "@/lib/format";
 import { useDoctorOptions } from "@/lib/hooks/use-doctors";
-import { useConditions, useDeletePatient, usePatients } from "@/lib/hooks/use-patients";
+import {
+  useConditions,
+  useDeletePatient,
+  usePatients,
+} from "@/lib/hooks/use-patients";
 import { useIsAdmin } from "@/lib/hooks/use-role";
 import { useSetTableParams, useTableParams } from "@/lib/search-params";
 
@@ -36,7 +40,10 @@ const SORT_ITEMS = [
 ];
 
 export const TableSkeleton = () => (
-  <main aria-busy="true" className="anim-fade mx-auto w-full max-w-6xl px-4 py-6">
+  <main
+    aria-busy="true"
+    className="anim-fade mx-auto w-full max-w-6xl px-4 py-6"
+  >
     <Skeleton className="mb-6 h-7 w-40" />
     <Skeleton className="h-14 w-full rounded-xl" />
     <Skeleton className="mt-4 h-72 w-full rounded-xl" />
@@ -75,7 +82,7 @@ export const PatientsView = () => {
         onDelete: setDeleteTarget,
         onEdit: setFormTarget,
       }),
-    [isAdmin],
+    [isAdmin]
   );
   const table = useTable({
     columns,
@@ -85,7 +92,9 @@ export const PatientsView = () => {
   });
 
   const result = query.data;
-  const hasFilters = Boolean(params.search || condition || doctorId || params.from || params.to);
+  const hasFilters = Boolean(
+    params.search || condition || doctorId || params.from || params.to
+  );
   const clearFilters = () =>
     setParams({
       condition: null,
@@ -97,7 +106,7 @@ export const PatientsView = () => {
 
   const exportCsv = async () => {
     const rows = await fetchAllPages((page) =>
-      api.patients.list({ ...listParams, limit: EXPORT_PAGE_SIZE, page }),
+      api.patients.list({ ...listParams, limit: EXPORT_PAGE_SIZE, page })
     );
     downloadCsv(
       "patients.csv",
@@ -107,16 +116,42 @@ export const PatientsView = () => {
         patient.condition,
         patient.doctor?.name ?? "Unassigned",
         formatDate(patient.createdAt),
-      ]),
+      ])
     );
   };
 
+  const emptyAction = (() => {
+    if (hasFilters) {
+      return <ClearFiltersButton onClear={clearFilters} />;
+    }
+    if (isAdmin) {
+      return (
+        <button
+          className={btn.primary}
+          onClick={() => setFormTarget("new")}
+          type="button"
+        >
+          <Plus className="h-4 w-4" />
+          Add patient
+        </button>
+      );
+    }
+    return null;
+  })();
+
   return (
     <main className="anim-enter mx-auto w-full max-w-6xl px-4 py-6">
-      <PageHeader description="Manage patients and their doctor assignments" title="Patients">
+      <PageHeader
+        description="Manage patients and their doctor assignments"
+        title="Patients"
+      >
         <ExportCsvButton onExport={exportCsv} />
         {isAdmin ? (
-          <button className={btn.primary} onClick={() => setFormTarget("new")} type="button">
+          <button
+            className={btn.primary}
+            onClick={() => setFormTarget("new")}
+            type="button"
+          >
             <Plus className="h-4 w-4" />
             New patient
           </button>
@@ -146,24 +181,19 @@ export const PatientsView = () => {
       <div
         className={cx(
           "mt-4 transition-opacity duration-150 motion-reduce:transition-none",
-          query.isFetching && !query.isPending && "opacity-60",
+          query.isFetching && !query.isPending && "opacity-60"
         )}
       >
         <DataTable
           columnCount={columns.length}
           empty={{
-            action: hasFilters ? (
-              <ClearFiltersButton onClear={clearFilters} />
-            ) : isAdmin ? (
-              <button className={btn.primary} onClick={() => setFormTarget("new")} type="button">
-                <Plus className="h-4 w-4" />
-                Add patient
-              </button>
-            ) : null,
+            action: emptyAction,
             description: hasFilters
               ? "Try different search terms or filters."
               : "Add your first patient to get started.",
-            title: hasFilters ? "No patients match your filters" : "No patients yet",
+            title: hasFilters
+              ? "No patients match your filters"
+              : "No patients yet",
           }}
           isError={query.isError}
           isLoading={query.isPending}

@@ -51,14 +51,20 @@ export const connectTestDb = async (): Promise<MongoMemoryServer> => {
   return mongod;
 };
 
-export const disconnectTestDb = async (mongod: MongoMemoryServer): Promise<void> => {
+export const disconnectTestDb = async (
+  mongod: MongoMemoryServer
+): Promise<void> => {
   await mongoose.disconnect();
   await mongod.stop();
 };
 
-export const clearCollections = () => Promise.all([Doctor.deleteMany({}), Patient.deleteMany({})]);
+export const clearCollections = () =>
+  Promise.all([Doctor.deleteMany({}), Patient.deleteMany({})]);
 
-export const makeDoctor = (index: number, overrides: Record<string, unknown> = {}) => {
+export const makeDoctor = (
+  index: number,
+  overrides: Record<string, unknown> = {}
+) => {
   const createdAt = new Date(Date.now() - index * DAY_MS);
   return {
     createdAt,
@@ -76,7 +82,7 @@ export const makeDoctor = (index: number, overrides: Record<string, unknown> = {
 export const makePatient = (
   index: number,
   doctorId: string,
-  overrides: Record<string, unknown> = {},
+  overrides: Record<string, unknown> = {}
 ) => {
   const createdAt = new Date(Date.now() - index * DAY_MS);
   return {
@@ -90,7 +96,10 @@ export const makePatient = (
   };
 };
 
-export const seedDoctor = async (index = 0, overrides: Record<string, unknown> = {}) => {
+export const seedDoctor = async (
+  index = 0,
+  overrides: Record<string, unknown> = {}
+) => {
   const doc = makeDoctor(index, overrides);
   await Doctor.insertMany([doc], { timestamps: false });
   return doc;
@@ -107,14 +116,14 @@ const bumpPatientCounts = async (doctorIds: string[]) => {
   await Doctor.bulkWrite(
     [...counts].map(([id, count]) => ({
       updateOne: { filter: { id }, update: { $inc: { patientCount: count } } },
-    })),
+    }))
   );
 };
 
 export const seedPatient = async (
   index: number,
   doctorId: string,
-  overrides: Record<string, unknown> = {},
+  overrides: Record<string, unknown> = {}
 ) => {
   const doc = makePatient(index, doctorId, overrides);
   await Patient.insertMany([doc], { timestamps: false });

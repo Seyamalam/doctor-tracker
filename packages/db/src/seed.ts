@@ -13,18 +13,27 @@ const PATIENT_SPREAD_DAYS = 120;
 const INSERT_CHUNK = 10_000;
 
 // Deterministic PRNG so reseeds produce the same dataset.
-const mulberry32 = (seed: number) => () => {
-  seed = (seed + 0x6d_2b_79_f5) | 0;
-  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-  return ((t ^ (t >>> 14)) >>> 0) / 4_294_967_296;
+/* oxlint-disable no-bitwise -- mulberry32 relies on 32-bit bitwise mixing */
+const mulberry32 = (seed: number) => {
+  let state = seed;
+  return () => {
+    state = Math.imul(state + 0x6d_2b_79_f5, 1);
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+    return ((t ^ (t >>> 14)) >>> 0) / 4_294_967_296;
+  };
 };
+/* oxlint-enable no-bitwise */
 
 const rand = mulberry32(0x5_13_37);
 
-const pick = <T>(items: readonly T[]): T => items[Math.floor(rand() * items.length)] as T;
+const pick = <T>(items: readonly T[]): T =>
+  items[Math.floor(rand() * items.length)] as T;
 
-const pickWeighted = (items: readonly string[], weights: readonly number[]): string => {
+const pickWeighted = (
+  items: readonly string[],
+  weights: readonly number[]
+): string => {
   const total = weights.reduce((sum, w) => sum + w, 0);
   let roll = rand() * total;
   for (const [index, weight] of weights.entries()) {
@@ -216,7 +225,9 @@ const CONDITIONS = [
 ] as const;
 
 // Skew toward the first six conditions so the donut chart has a clear shape.
-const CONDITION_WEIGHTS = [14, 12, 10, 8, 7, 6, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1] as const;
+const CONDITION_WEIGHTS = [
+  14, 12, 10, 8, 7, 6, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1,
+] as const;
 
 const slugify = (name: string): string =>
   name
@@ -227,7 +238,7 @@ const slugify = (name: string): string =>
 // Bangladeshi mobile format, e.g. +880 1712-345678.
 const phone = (): string =>
   `+880 1${Math.floor(rand() * 9)}${Math.floor(rand() * 10)}-${String(
-    Math.floor(rand() * 1_000_000),
+    Math.floor(rand() * 1_000_000)
   ).padStart(6, "0")}`;
 
 const buildDoctors = (now: number) => {
@@ -282,11 +293,15 @@ const buildPatients = (doctors: DoctorSeed[], now: number) => {
 
 const insertChunked = async <T extends object>(
   model: {
-    insertMany: (docs: T[], options: { timestamps: boolean }) => Promise<unknown>;
+    insertMany: (
+      docs: T[],
+      options: { timestamps: boolean }
+    ) => Promise<unknown>;
   },
-  docs: T[],
+  docs: T[]
 ): Promise<void> => {
   for (let start = 0; start < docs.length; start += INSERT_CHUNK) {
+    // oxlint-disable-next-line no-await-in-loop -- sequential chunks bound memory use
     await model.insertMany(docs.slice(start, start + INSERT_CHUNK), {
       timestamps: false,
     });
@@ -306,7 +321,7 @@ const main = async (): Promise<void> => {
   await insertChunked(Patient, patients);
 
   console.log(
-    `Seed complete: ${doctors.length} doctors, ${patients.length} patients in ${Date.now() - started}ms`,
+    `Seed complete: ${doctors.length} doctors, ${patients.length} patients in ${Date.now() - started}ms`
   );
 };
 

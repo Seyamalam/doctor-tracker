@@ -1,7 +1,13 @@
 "use client";
 
 import type { ReactTable, RowData, TableFeatures } from "@tanstack/react-table";
-import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@ui-sdk/react/menu";
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuSeparator,
+  MenuTrigger,
+} from "@ui-sdk/react/menu";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -43,17 +49,27 @@ export const DataTable = <TData extends RowData>({
   const { rows } = table.getRowModel();
   return (
     <div className="anim-fade border-border bg-card overflow-x-auto overscroll-contain rounded-xl border shadow-sm">
-      <table className={cx("w-full border-collapse text-left text-sm", minWidthClass)}>
+      <table
+        className={cx(
+          "w-full border-collapse text-left text-sm",
+          minWidthClass
+        )}
+      >
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr className="border-border bg-muted/50 border-b" key={headerGroup.id}>
+            <tr
+              className="border-border bg-muted/50 border-b"
+              key={headerGroup.id}
+            >
               {headerGroup.headers.map((header) => (
                 <th
-                  className="text-muted-foreground relative h-10 px-3 align-middle text-[11px] font-medium uppercase tracking-[0.06em] whitespace-nowrap"
+                  className="text-muted-foreground relative h-10 px-3 align-middle text-[11px] font-medium tracking-[0.06em] whitespace-nowrap uppercase"
                   key={header.id}
                   scope="col"
                 >
-                  {header.isPlaceholder ? null : <table.FlexRender header={header} />}
+                  {header.isPlaceholder ? null : (
+                    <table.FlexRender header={header} />
+                  )}
                 </th>
               ))}
             </tr>
@@ -87,15 +103,23 @@ export const DataTable = <TData extends RowData>({
       </table>
       {isError ? (
         <div className="flex flex-col items-center gap-2 px-6 py-10 text-center">
-          <p className="text-foreground text-sm font-medium">Could not load data</p>
-          <p className="text-muted-foreground text-[13px]">Check your connection and try again.</p>
+          <p className="text-foreground text-sm font-medium">
+            Could not load data
+          </p>
+          <p className="text-muted-foreground text-[13px]">
+            Check your connection and try again.
+          </p>
           <button className={btn.outline} onClick={onRetry} type="button">
             Retry
           </button>
         </div>
       ) : null}
       {!isLoading && !isError && rows.length === 0 ? (
-        <EmptyState action={empty.action} description={empty.description} title={empty.title} />
+        <EmptyState
+          action={empty.action}
+          description={empty.description}
+          title={empty.title}
+        />
       ) : null}
     </div>
   );
@@ -118,7 +142,10 @@ export const RowActionsMenu = ({ onEdit, onDelete }: RowActionsMenuProps) => (
   >
     <MenuTrigger
       aria-label="Row actions"
-      className={cx(btn.icon, "data-popup-open:bg-muted data-popup-open:text-foreground")}
+      className={cx(
+        btn.icon,
+        "data-popup-open:bg-muted data-popup-open:text-foreground"
+      )}
     >
       <MoreHorizontal className="h-4 w-4" />
     </MenuTrigger>

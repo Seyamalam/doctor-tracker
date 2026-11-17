@@ -6,7 +6,10 @@ const SESSION_COOKIE_SUFFIX = "better-auth.session_token";
 const hasSessionCookie = (request: NextRequest): boolean =>
   request.cookies
     .getAll()
-    .some((cookie) => cookie.name.endsWith(SESSION_COOKIE_SUFFIX) && cookie.value.length > 0);
+    .some(
+      (cookie) =>
+        cookie.name.endsWith(SESSION_COOKIE_SUFFIX) && cookie.value.length > 0
+    );
 
 export const proxy = (request: NextRequest) => {
   if (hasSessionCookie(request)) {

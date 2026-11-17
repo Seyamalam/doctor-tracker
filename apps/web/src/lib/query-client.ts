@@ -1,4 +1,9 @@
-import { environmentManager, MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
+import {
+  environmentManager,
+  MutationCache,
+  QueryCache,
+  QueryClient,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { isUnauthorized } from "@/lib/api";

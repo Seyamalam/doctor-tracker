@@ -1,3 +1,1 @@
-import { TableSkeleton } from "./doctors-view";
-
-export default TableSkeleton;
+export { TableSkeleton as default } from "./doctors-view";

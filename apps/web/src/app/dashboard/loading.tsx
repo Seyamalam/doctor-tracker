@@ -1,3 +1,1 @@
-import { DashboardSkeleton } from "./dashboard";
-
-export default DashboardSkeleton;
+export { DashboardSkeleton as default } from "./dashboard";

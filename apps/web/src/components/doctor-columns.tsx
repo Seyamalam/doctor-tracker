@@ -19,14 +19,18 @@ interface DoctorColumnsOptions {
   onDelete: (doctor: Doctor) => void;
 }
 
-export const doctorColumns = ({ canMutate = true, onEdit, onDelete }: DoctorColumnsOptions) =>
+export const doctorColumns = ({
+  canMutate = true,
+  onEdit,
+  onDelete,
+}: DoctorColumnsOptions) =>
   helper.columns([
     helper.accessor("name", {
       cell: (ctx) => (
         <span className="flex items-center gap-2.5">
           <CellAvatar name={ctx.getValue()} />
           <Link
-            className="text-foreground block max-w-44 truncate font-medium hover:text-primary hover:underline"
+            className="text-foreground hover:text-primary block max-w-44 truncate font-medium hover:underline"
             href={`/doctors/${ctx.row.original.id}` as Route}
             title={ctx.getValue()}
           >
@@ -53,23 +57,36 @@ export const doctorColumns = ({ canMutate = true, onEdit, onDelete }: DoctorColu
       header: "Hospital",
     }),
     helper.accessor("phone", {
-      cell: (ctx) => <span className="text-muted-foreground tabular-nums">{ctx.getValue()}</span>,
+      cell: (ctx) => (
+        <span className="text-muted-foreground tabular-nums">
+          {ctx.getValue()}
+        </span>
+      ),
       header: "Phone",
     }),
     helper.accessor("email", {
       cell: (ctx) => (
-        <span className="text-muted-foreground block max-w-40 truncate" title={ctx.getValue()}>
+        <span
+          className="text-muted-foreground block max-w-40 truncate"
+          title={ctx.getValue()}
+        >
           {ctx.getValue()}
         </span>
       ),
       header: "Email",
     }),
     helper.accessor("patientCount", {
-      cell: (ctx) => <span className="font-medium tabular-nums">{ctx.getValue()}</span>,
+      cell: (ctx) => (
+        <span className="font-medium tabular-nums">{ctx.getValue()}</span>
+      ),
       header: "Patients",
     }),
     helper.accessor("createdAt", {
-      cell: (ctx) => <span className="text-muted-foreground">{formatDate(ctx.getValue())}</span>,
+      cell: (ctx) => (
+        <span className="text-muted-foreground">
+          {formatDate(ctx.getValue())}
+        </span>
+      ),
       header: "Added",
     }),
     ...(canMutate

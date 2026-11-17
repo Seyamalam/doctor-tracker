@@ -6,7 +6,9 @@ import { asyncHandler } from "../lib/async-handler";
 
 type Auth = ReturnType<typeof createAuth>;
 
-export type Session = NonNullable<Awaited<ReturnType<Auth["api"]["getSession"]>>>;
+export type Session = NonNullable<
+  Awaited<ReturnType<Auth["api"]["getSession"]>>
+>;
 
 declare module "express-serve-static-core" {
   interface Request {

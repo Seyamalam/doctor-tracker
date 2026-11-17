@@ -1,3 +1,1 @@
-import { DoctorViewSkeleton } from "./doctor-view";
-
-export default DoctorViewSkeleton;
+export { DoctorViewSkeleton as default } from "./doctor-view";

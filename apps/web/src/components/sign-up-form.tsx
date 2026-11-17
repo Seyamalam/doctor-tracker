@@ -41,7 +41,7 @@ const SignUpForm = ({ onSwitchToSignIn }: { onSwitchToSignIn: () => void }) => {
             router.push("/dashboard");
             toast.success("Account created");
           },
-        },
+        }
       );
     },
     validators: {
@@ -69,15 +69,38 @@ const SignUpForm = ({ onSwitchToSignIn }: { onSwitchToSignIn: () => void }) => {
         form.handleSubmit();
       }}
     >
-      <form.Field name="name" validators={{ onChange: signUpSchema.shape.name }}>
-        {(field) => <TextField autoComplete="name" field={field} label="Name" />}
-      </form.Field>
-      <form.Field name="email" validators={{ onChange: signUpSchema.shape.email }}>
-        {(field) => <TextField autoComplete="email" field={field} label="Email" type="email" />}
-      </form.Field>
-      <form.Field name="password" validators={{ onChange: signUpSchema.shape.password }}>
+      <form.Field
+        name="name"
+        validators={{ onChange: signUpSchema.shape.name }}
+      >
         {(field) => (
-          <TextField autoComplete="new-password" field={field} label="Password" type="password" />
+          <TextField autoComplete="name" field={field} label="Name" />
+        )}
+      </form.Field>
+      <form.Field
+        name="email"
+        validators={{ onChange: signUpSchema.shape.email }}
+      >
+        {(field) => (
+          <TextField
+            autoComplete="email"
+            field={field}
+            label="Email"
+            type="email"
+          />
+        )}
+      </form.Field>
+      <form.Field
+        name="password"
+        validators={{ onChange: signUpSchema.shape.password }}
+      >
+        {(field) => (
+          <TextField
+            autoComplete="new-password"
+            field={field}
+            label="Password"
+            type="password"
+          />
         )}
       </form.Field>
       <form.Subscribe

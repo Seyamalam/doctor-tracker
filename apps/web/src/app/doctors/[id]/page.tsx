@@ -12,7 +12,8 @@ export const generateMetadata = async ({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> => {
   const { id } = await params;
-  const cookie = (await headers()).get("cookie") ?? "";
+  const requestHeaders = await headers();
+  const cookie = requestHeaders.get("cookie") ?? "";
   try {
     const doctor = await api.doctors.get(id, { headers: { cookie } });
     return {

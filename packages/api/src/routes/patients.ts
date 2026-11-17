@@ -14,11 +14,20 @@ import {
   sendValidationError,
   sortParam,
 } from "../lib/listing";
-import type { EmbeddedDoctor, PatientWithDoctor } from "../lib/patient-projection";
+import type {
+  EmbeddedDoctor,
+  PatientWithDoctor,
+} from "../lib/patient-projection";
 import { doctorEmbedStages } from "../lib/patient-projection";
 import { requireAdmin } from "../middleware/require-role";
 
-const SORTABLE_FIELDS = ["condition", "createdAt", "doctorId", "name", "updatedAt"] as const;
+const SORTABLE_FIELDS = [
+  "condition",
+  "createdAt",
+  "doctorId",
+  "name",
+  "updatedAt",
+] as const;
 
 const listQuerySchema = z.object({
   ...listQueryFields,
@@ -48,7 +57,9 @@ interface PatientDoc {
   updatedAt: Date;
 }
 
-const findEmbeddedDoctor = async (doctorId: string): Promise<EmbeddedDoctor | null> => {
+const findEmbeddedDoctor = async (
+  doctorId: string
+): Promise<EmbeddedDoctor | null> => {
   const doctor = await Doctor.findOne({ id: doctorId })
     .select("-_id id name specialization")
     .lean();
@@ -72,7 +83,8 @@ patientsRouter.get(
       sendValidationError(res, parsed.error);
       return;
     }
-    const { condition, doctorId, from, limit, page, search, sort, to } = parsed.data;
+    const { condition, doctorId, from, limit, page, search, sort, to } =
+      parsed.data;
 
     const match: Record<string, unknown> = {};
     if (search) {
@@ -105,7 +117,7 @@ patientsRouter.get(
     });
 
     res.json(result);
-  }),
+  })
 );
 
 // Registered before /:id so the literal segment wins over the param route.
@@ -117,7 +129,7 @@ patientsRouter.get(
       .filter((value) => typeof value === "string" && value.length > 0)
       .toSorted((a, b) => a.localeCompare(b));
     res.json({ data });
-  }),
+  })
 );
 
 patientsRouter.post(
@@ -135,10 +147,13 @@ patientsRouter.post(
       return;
     }
     const created = await Patient.create(parsed.data);
-    await Doctor.updateOne({ id: parsed.data.doctorId }, { $inc: { patientCount: 1 } });
+    await Doctor.updateOne(
+      { id: parsed.data.doctorId },
+      { $inc: { patientCount: 1 } }
+    );
     const { _id, __v, ...doc } = created.toObject();
     res.status(201).json({ ...doc, doctor });
-  }),
+  })
 );
 
 patientsRouter.get(
@@ -158,7 +173,7 @@ patientsRouter.get(
     }
     const doctor = await findEmbeddedDoctor(doc.doctorId);
     res.json({ ...doc, doctor });
-  }),
+  })
 );
 
 patientsRouter.patch(
@@ -192,11 +207,14 @@ patientsRouter.patch(
     const doc = await Patient.findOneAndUpdate(
       { id: params.data.id },
       { $set: parsed.data },
-      { returnDocument: "after" },
+      { returnDocument: "after" }
     )
       .select("-_id -__v")
       .lean<PatientDoc>();
-    if (parsed.data.doctorId !== undefined && parsed.data.doctorId !== current.doctorId) {
+    if (
+      parsed.data.doctorId !== undefined &&
+      parsed.data.doctorId !== current.doctorId
+    ) {
       await Doctor.bulkWrite([
         {
           updateOne: {
@@ -214,7 +232,7 @@ patientsRouter.patch(
     }
     const doctor = await findEmbeddedDoctor(doc?.doctorId ?? "");
     res.json({ ...doc, doctor });
-  }),
+  })
 );
 
 patientsRouter.delete(
@@ -233,7 +251,10 @@ patientsRouter.delete(
       res.status(404).json({ error: "Patient not found" });
       return;
     }
-    await Doctor.updateOne({ id: deleted.doctorId }, { $inc: { patientCount: -1 } });
+    await Doctor.updateOne(
+      { id: deleted.doctorId },
+      { $inc: { patientCount: -1 } }
+    );
     res.status(204).end();
-  }),
+  })
 );

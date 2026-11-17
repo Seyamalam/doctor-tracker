@@ -30,12 +30,17 @@ const upsertAccount = async (account: (typeof DEMO_ACCOUNTS)[number]) => {
       headers: new Headers({ origin: serverEnv.CORS_ORIGIN }),
     });
   }
-  await User.updateOne({ email: account.email }, { $set: { role: account.role } });
+  await User.updateOne(
+    { email: account.email },
+    { $set: { role: account.role } }
+  );
 };
 
-for (const account of DEMO_ACCOUNTS) {
-  await upsertAccount(account);
-  console.log(`seeded ${account.email} (${account.role})`);
-}
+await Promise.all(
+  DEMO_ACCOUNTS.map(async (account) => {
+    await upsertAccount(account);
+    console.log(`seeded ${account.email} (${account.role})`);
+  })
+);
 
 process.exit(0);

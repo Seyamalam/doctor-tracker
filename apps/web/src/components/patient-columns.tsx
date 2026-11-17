@@ -31,7 +31,10 @@ export const patientColumns = ({
       cell: (ctx) => (
         <span className="flex items-center gap-2.5">
           <CellAvatar name={ctx.getValue()} tone="muted" />
-          <span className="block max-w-44 truncate font-medium" title={ctx.getValue()}>
+          <span
+            className="block max-w-44 truncate font-medium"
+            title={ctx.getValue()}
+          >
             {ctx.getValue()}
           </span>
         </span>
@@ -69,7 +72,11 @@ export const patientColumns = ({
         ]
       : []),
     helper.accessor("createdAt", {
-      cell: (ctx) => <span className="text-muted-foreground">{formatDate(ctx.getValue())}</span>,
+      cell: (ctx) => (
+        <span className="text-muted-foreground">
+          {formatDate(ctx.getValue())}
+        </span>
+      ),
       header: "Added",
     }),
     ...(canMutate

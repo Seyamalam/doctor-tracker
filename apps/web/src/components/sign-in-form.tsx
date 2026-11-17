@@ -38,7 +38,7 @@ const SignInForm = ({ onSwitchToSignUp }: { onSwitchToSignUp: () => void }) => {
             router.push("/dashboard");
             toast.success("Welcome back");
           },
-        },
+        }
       );
     },
     validators: {
@@ -65,10 +65,23 @@ const SignInForm = ({ onSwitchToSignUp }: { onSwitchToSignUp: () => void }) => {
         form.handleSubmit();
       }}
     >
-      <form.Field name="email" validators={{ onChange: signInSchema.shape.email }}>
-        {(field) => <TextField autoComplete="email" field={field} label="Email" type="email" />}
+      <form.Field
+        name="email"
+        validators={{ onChange: signInSchema.shape.email }}
+      >
+        {(field) => (
+          <TextField
+            autoComplete="email"
+            field={field}
+            label="Email"
+            type="email"
+          />
+        )}
       </form.Field>
-      <form.Field name="password" validators={{ onChange: signInSchema.shape.password }}>
+      <form.Field
+        name="password"
+        validators={{ onChange: signInSchema.shape.password }}
+      >
         {(field) => (
           <TextField
             autoComplete="current-password"

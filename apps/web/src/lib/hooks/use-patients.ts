@@ -1,11 +1,22 @@
 "use client";
 
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import type { QueryKey } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api, isUnauthorized } from "@/lib/api";
-import type { ApiError, Paginated, Patient, PatientInput, PatientsParams } from "@/lib/api";
+import type {
+  ApiError,
+  Paginated,
+  Patient,
+  PatientInput,
+  PatientsParams,
+} from "@/lib/api";
 
 const toastError = (error: unknown, fallback: string) => {
   if (!isUnauthorized(error)) {
@@ -79,7 +90,7 @@ export const useDeletePatient = () => {
       toastError(error, "Could not delete patient");
     },
     onMutate: async (
-      id,
+      id
     ): Promise<{
       previous: [QueryKey, Paginated<Patient> | undefined][];
     }> => {

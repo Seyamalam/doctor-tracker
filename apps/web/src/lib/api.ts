@@ -1,7 +1,11 @@
 import { ENV } from "@/env";
 
-const boundServerUrl = typeof window === "undefined" ? process.env.SERVER_URL : undefined;
-const BASE_URL = (boundServerUrl ?? ENV.NEXT_PUBLIC_SERVER_URL ?? "").replace(/\/$/u, "");
+const boundServerUrl =
+  typeof window === "undefined" ? process.env.SERVER_URL : undefined;
+const BASE_URL = (boundServerUrl ?? ENV.NEXT_PUBLIC_SERVER_URL ?? "").replace(
+  /\/$/u,
+  ""
+);
 
 export class ApiError extends Error {
   status: number;
@@ -51,7 +55,9 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   return res.json() as Promise<T>;
 };
 
-const toQuery = (params: Record<string, string | number | undefined>): string => {
+const toQuery = (
+  params: Record<string, string | number | undefined>
+): string => {
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
     if (value !== undefined && value !== "") {
@@ -158,13 +164,18 @@ export const api = {
         body: JSON.stringify(data),
         method: "POST",
       }),
-    get: (id: string, init?: RequestInit) => request<Doctor>(`/doctors/${id}`, init),
+    get: (id: string, init?: RequestInit) =>
+      request<Doctor>(`/doctors/${id}`, init),
     list: (params: DoctorsParams) =>
       request<Paginated<Doctor>>(`/doctors${toQuery({ ...params })}`),
     patients: (id: string, params: DoctorPatientsParams) =>
-      request<Paginated<Patient>>(`/doctors/${id}/patients${toQuery({ ...params })}`),
-    remove: (id: string) => request<undefined>(`/doctors/${id}`, { method: "DELETE" }),
-    specializations: () => request<{ data: string[] }>("/doctors/specializations"),
+      request<Paginated<Patient>>(
+        `/doctors/${id}/patients${toQuery({ ...params })}`
+      ),
+    remove: (id: string) =>
+      request<undefined>(`/doctors/${id}`, { method: "DELETE" }),
+    specializations: () =>
+      request<{ data: string[] }>("/doctors/specializations"),
     update: (id: string, data: Partial<DoctorInput>) =>
       request<Doctor>(`/doctors/${id}`, {
         body: JSON.stringify(data),
@@ -182,7 +193,8 @@ export const api = {
     get: (id: string) => request<Patient>(`/patients/${id}`),
     list: (params: PatientsParams) =>
       request<Paginated<Patient>>(`/patients${toQuery({ ...params })}`),
-    remove: (id: string) => request<undefined>(`/patients/${id}`, { method: "DELETE" }),
+    remove: (id: string) =>
+      request<undefined>(`/patients/${id}`, { method: "DELETE" }),
     update: (id: string, data: Partial<PatientInput>) =>
       request<Patient>(`/patients/${id}`, {
         body: JSON.stringify(data),

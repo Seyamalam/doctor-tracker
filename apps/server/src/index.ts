@@ -1,4 +1,8 @@
-import { createApiRouter, errorHandler, notFoundHandler } from "@doctor-tracker/api";
+import {
+  createApiRouter,
+  errorHandler,
+  notFoundHandler,
+} from "@doctor-tracker/api";
 import { toNodeHandler } from "better-auth/node";
 import compression from "compression";
 import cors from "cors";
@@ -29,7 +33,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     origin: serverEnv.CORS_ORIGIN,
-  }),
+  })
 );
 
 app.use(
@@ -40,7 +44,7 @@ app.use(
     message: RATE_LIMIT_MESSAGE,
     standardHeaders: true,
     windowMs: FIFTEEN_MINUTES_MS,
-  }),
+  })
 );
 app.all("/api/auth{/*path}", toNodeHandler(auth));
 
@@ -54,7 +58,7 @@ app.use(
     message: RATE_LIMIT_MESSAGE,
     standardHeaders: true,
     windowMs: FIFTEEN_MINUTES_MS,
-  }),
+  })
 );
 app.use("/api", createApiRouter(auth));
 

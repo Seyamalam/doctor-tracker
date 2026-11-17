@@ -22,7 +22,11 @@ interface TablePaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export const TablePagination = ({ page, pageCount, onPageChange }: TablePaginationProps) => {
+export const TablePagination = ({
+  page,
+  pageCount,
+  onPageChange,
+}: TablePaginationProps) => {
   if (pageCount <= 1) {
     return null;
   }
@@ -48,14 +52,22 @@ export const TablePagination = ({ page, pageCount, onPageChange }: TablePaginati
             {items.map((item) => (
               <PaginationItem key={item}>
                 {typeof item === "number" ? (
-                  <PaginationLink className={pageBtn} data-variant="ghost" page={item} />
+                  <PaginationLink
+                    className={pageBtn}
+                    data-variant="ghost"
+                    page={item}
+                  />
                 ) : (
                   <PaginationEllipsis className="text-muted-foreground flex h-8 w-8 items-center justify-center" />
                 )}
               </PaginationItem>
             ))}
             <PaginationItem>
-              <PaginationNext aria-label="Next page" className={cx(pageBtn)} data-variant="ghost">
+              <PaginationNext
+                aria-label="Next page"
+                className={cx(pageBtn)}
+                data-variant="ghost"
+              >
                 <ChevronRight className="h-4 w-4" />
               </PaginationNext>
             </PaginationItem>

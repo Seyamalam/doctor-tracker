@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Doctor Tracker — secure admin dashboard for managing doctors and patients";
+export const alt =
+  "Doctor Tracker — secure admin dashboard for managing doctors and patients";
 export const size = { height: 630, width: 1200 };
 export const contentType = "image/png";
 
@@ -72,8 +73,8 @@ const OpenGraphImage = () =>
               lineHeight: 1.4,
             }}
           >
-            Secure admin portal for managing doctors and their patients — search, filters,
-            pagination and live analytics.
+            Secure admin portal for managing doctors and their patients —
+            search, filters, pagination and live analytics.
           </span>
           <div style={{ display: "flex", gap: "14px" }}>
             {["Next.js 16", "Express 5", "MongoDB", "RBAC"].map((label) => (
@@ -109,7 +110,7 @@ const OpenGraphImage = () =>
       </div>
       <PulseLine />
     </div>,
-    { ...size },
+    { ...size }
   );
 
 export default OpenGraphImage;

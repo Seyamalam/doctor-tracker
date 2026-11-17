@@ -41,7 +41,7 @@ const doctorSchema = new Schema(
     collection: "doctor",
     id: false,
     timestamps: true,
-  },
+  }
 );
 
 doctorSchema.index({ name: 1 });

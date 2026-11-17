@@ -35,7 +35,7 @@ export const selectTriggerCls =
 export const selectContentCls = cx(
   popupCls,
   popupAnimCls,
-  "max-h-72 min-w-(--anchor-width) max-w-[min(26rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain p-1",
+  "max-h-72 min-w-(--anchor-width) max-w-[min(26rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain p-1"
 );
 
 export const TextField = ({
@@ -88,11 +88,18 @@ export const SelectField = ({
     >
       <SelectTrigger className={selectTriggerCls}>
         <SelectValue />
-        <ChevronDown aria-hidden="true" className="text-muted-foreground h-4 w-4 shrink-0" />
+        <ChevronDown
+          aria-hidden="true"
+          className="text-muted-foreground h-4 w-4 shrink-0"
+        />
       </SelectTrigger>
       <SelectContent className={selectContentCls} side="bottom" sideOffset={4}>
         {items.map((item) => (
-          <SelectItem className={selectItemCls} key={item.value} value={item.value}>
+          <SelectItem
+            className={selectItemCls}
+            key={item.value}
+            value={item.value}
+          >
             <span className="min-w-0 truncate" title={item.label}>
               {item.label}
             </span>

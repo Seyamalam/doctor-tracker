@@ -38,7 +38,9 @@ const validDoctor = {
 
 describe("POST /api/doctors", () => {
   it("creates a doctor and returns it with patientCount 0", async () => {
-    const res = await request(authedApp()).post("/api/doctors").send(validDoctor);
+    const res = await request(authedApp())
+      .post("/api/doctors")
+      .send(validDoctor);
     expect(res.status).toBe(201);
     expect(res.body.id).toBeTypeOf("string");
     expect(res.body.name).toBe(validDoctor.name);
@@ -50,7 +52,9 @@ describe("POST /api/doctors", () => {
 
   it("rejects a body missing email", async () => {
     const { email: _email, ...withoutEmail } = validDoctor;
-    const res = await request(authedApp()).post("/api/doctors").send(withoutEmail);
+    const res = await request(authedApp())
+      .post("/api/doctors")
+      .send(withoutEmail);
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("Validation failed");
     expect(Array.isArray(res.body.issues)).toBe(true);
@@ -110,7 +114,9 @@ describe("GET /api/doctors", () => {
     const docs = Array.from({ length: 12 }, (_, i) => makeDoctor(i));
     await seedDoctors(docs);
 
-    const res = await request(authedApp()).get("/api/doctors?limit=10&page=9999");
+    const res = await request(authedApp()).get(
+      "/api/doctors?limit=10&page=9999"
+    );
     expect(res.status).toBe(200);
     expect(res.body.page).toBe(2);
     expect(res.body.totalPages).toBe(2);
@@ -134,13 +140,18 @@ describe("GET /api/doctors", () => {
       makeDoctor(0, { specialization: "Cardiology" }),
       makeDoctor(1, { specialization: "Neurology" }),
     ]);
-    const res = await request(authedApp()).get("/api/doctors?specialization=Neurology");
+    const res = await request(authedApp()).get(
+      "/api/doctors?specialization=Neurology"
+    );
     expect(res.body.total).toBe(1);
     expect(res.body.data[0].specialization).toBe("Neurology");
   });
 
   it("sorts by name:asc and rejects invalid sort fields", async () => {
-    await seedDoctors([makeDoctor(0, { name: "Zed" }), makeDoctor(1, { name: "Alpha" })]);
+    await seedDoctors([
+      makeDoctor(0, { name: "Zed" }),
+      makeDoctor(1, { name: "Alpha" }),
+    ]);
     const app = authedApp();
     const res = await request(app).get("/api/doctors?sort=name:asc");
     expect(res.body.data[0].name).toBe("Alpha");
@@ -183,7 +194,7 @@ describe("GET /api/doctors/:id", () => {
 
   it("404s on a missing doctor", async () => {
     const res = await request(authedApp()).get(
-      `/api/doctors/${new mongoose.Types.ObjectId().toString()}`,
+      `/api/doctors/${new mongoose.Types.ObjectId().toString()}`
     );
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ error: "Doctor not found" });
@@ -223,7 +234,9 @@ describe("DELETE /api/doctors/:id", () => {
   });
 
   it("404s on a missing doctor", async () => {
-    const res = await request(authedApp()).delete(`/api/doctors/${makeDoctor(99).id}`);
+    const res = await request(authedApp()).delete(
+      `/api/doctors/${makeDoctor(99).id}`
+    );
     expect(res.status).toBe(404);
   });
 });
@@ -238,7 +251,9 @@ describe("GET /api/doctors/:id/patients", () => {
       makePatient(2, other.id, { condition: "Asthma", name: "Other Guy" }),
     ]);
 
-    const res = await request(authedApp()).get(`/api/doctors/${doc.id}/patients`);
+    const res = await request(authedApp()).get(
+      `/api/doctors/${doc.id}/patients`
+    );
     expect(res.status).toBe(200);
     expect(res.body.total).toBe(2);
     for (const patient of res.body.data) {
@@ -247,7 +262,7 @@ describe("GET /api/doctors/:id/patients", () => {
     }
 
     const filtered = await request(authedApp()).get(
-      `/api/doctors/${doc.id}/patients?condition=Asthma`,
+      `/api/doctors/${doc.id}/patients?condition=Asthma`
     );
     expect(filtered.body.total).toBe(1);
   });
@@ -260,17 +275,23 @@ describe("GET /api/doctors/:id/patients", () => {
       makePatient(2, doc.id, { name: "Mike" }),
     ]);
 
-    const sorted = await request(authedApp()).get(`/api/doctors/${doc.id}/patients?sort=name:asc`);
+    const sorted = await request(authedApp()).get(
+      `/api/doctors/${doc.id}/patients?sort=name:asc`
+    );
     expect(sorted.status).toBe(200);
-    expect(sorted.body.data.map((p: { name: string }) => p.name)).toEqual(["Able", "Mike", "Zulu"]);
+    expect(sorted.body.data.map((p: { name: string }) => p.name)).toEqual([
+      "Able",
+      "Mike",
+      "Zulu",
+    ]);
 
     const bad = await request(authedApp()).get(
-      `/api/doctors/${doc.id}/patients?sort=doctorId:desc`,
+      `/api/doctors/${doc.id}/patients?sort=doctorId:desc`
     );
     expect(bad.status).toBe(400);
 
     const clamped = await request(authedApp()).get(
-      `/api/doctors/${doc.id}/patients?limit=2&page=99`,
+      `/api/doctors/${doc.id}/patients?limit=2&page=99`
     );
     expect(clamped.status).toBe(200);
     expect(clamped.body.page).toBe(2);
@@ -278,7 +299,9 @@ describe("GET /api/doctors/:id/patients", () => {
   });
 
   it("404s when the doctor does not exist", async () => {
-    const res = await request(authedApp()).get(`/api/doctors/${makeDoctor(99).id}/patients`);
+    const res = await request(authedApp()).get(
+      `/api/doctors/${makeDoctor(99).id}/patients`
+    );
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ error: "Doctor not found" });
   });

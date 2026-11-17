@@ -19,7 +19,13 @@ const doctorSchema = z.object({
   specialization: z.string().min(2, "Specialization is required"),
 });
 
-const DoctorForm = ({ doctor, onDone }: { doctor?: Doctor; onDone: () => void }) => {
+const DoctorForm = ({
+  doctor,
+  onDone,
+}: {
+  doctor?: Doctor;
+  onDone: () => void;
+}) => {
   const createDoctor = useCreateDoctor();
   const updateDoctor = useUpdateDoctor();
 
@@ -57,7 +63,10 @@ const DoctorForm = ({ doctor, onDone }: { doctor?: Doctor; onDone: () => void })
         form.handleSubmit();
       }}
     >
-      <form.Field name="name" validators={{ onChange: doctorSchema.shape.name }}>
+      <form.Field
+        name="name"
+        validators={{ onChange: doctorSchema.shape.name }}
+      >
         {(field) => <TextField field={field} label="Name" />}
       </form.Field>
       <form.Field
@@ -65,18 +74,38 @@ const DoctorForm = ({ doctor, onDone }: { doctor?: Doctor; onDone: () => void })
         validators={{ onChange: doctorSchema.shape.specialization }}
       >
         {(field) => (
-          <TextField field={field} label="Specialization" placeholder="e.g. Cardiology" />
+          <TextField
+            field={field}
+            label="Specialization"
+            placeholder="e.g. Cardiology"
+          />
         )}
       </form.Field>
-      <form.Field name="hospital" validators={{ onChange: doctorSchema.shape.hospital }}>
+      <form.Field
+        name="hospital"
+        validators={{ onChange: doctorSchema.shape.hospital }}
+      >
         {(field) => <TextField field={field} label="Hospital" />}
       </form.Field>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <form.Field name="phone" validators={{ onChange: doctorSchema.shape.phone }}>
+        <form.Field
+          name="phone"
+          validators={{ onChange: doctorSchema.shape.phone }}
+        >
           {(field) => <TextField field={field} label="Phone" type="tel" />}
         </form.Field>
-        <form.Field name="email" validators={{ onChange: doctorSchema.shape.email }}>
-          {(field) => <TextField autoComplete="email" field={field} label="Email" type="email" />}
+        <form.Field
+          name="email"
+          validators={{ onChange: doctorSchema.shape.email }}
+        >
+          {(field) => (
+            <TextField
+              autoComplete="email"
+              field={field}
+              label="Email"
+              type="email"
+            />
+          )}
         </form.Field>
       </div>
       <div className="flex justify-end gap-2 pt-1">
@@ -88,7 +117,11 @@ const DoctorForm = ({ doctor, onDone }: { doctor?: Doctor; onDone: () => void })
           })}
         >
           {({ canSubmit, isSubmitting }) => (
-            <Button className={btn.primary} disabled={!canSubmit || isSubmitting} type="submit">
+            <Button
+              className={btn.primary}
+              disabled={!canSubmit || isSubmitting}
+              type="submit"
+            >
               {isSubmitting ? "Saving…" : submitLabel}
             </Button>
           )}
@@ -108,7 +141,11 @@ export const DoctorFormDialog = ({
   doctor?: Doctor;
 }) => (
   <FormDialog
-    description={doctor ? "Update this doctor's details." : "Add a doctor to the directory."}
+    description={
+      doctor
+        ? "Update this doctor's details."
+        : "Add a doctor to the directory."
+    }
     onOpenChange={onOpenChange}
     open={open}
     title={doctor ? "Edit doctor" : "New doctor"}

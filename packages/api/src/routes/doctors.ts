@@ -27,7 +27,12 @@ const SORTABLE_FIELDS = [
   "updatedAt",
 ] as const;
 
-const PATIENT_SORTABLE_FIELDS = ["condition", "createdAt", "name", "updatedAt"] as const;
+const PATIENT_SORTABLE_FIELDS = [
+  "condition",
+  "createdAt",
+  "name",
+  "updatedAt",
+] as const;
 
 const listQuerySchema = z.object({
   ...listQueryFields,
@@ -78,7 +83,7 @@ const doctorProjectStage = {
   $project: { __v: 0, _id: 0 },
 };
 
-const toDoctorItem = async (doc: Record<string, unknown>): Promise<DoctorItem> => {
+const toDoctorItem = (doc: Record<string, unknown>): DoctorItem => {
   const { _id, __v, ...rest } = doc;
   return {
     ...(rest as Omit<DoctorItem, "patientCount">),
@@ -131,7 +136,7 @@ doctorsRouter.get(
     });
 
     res.json(result);
-  }),
+  })
 );
 
 // Registered before /:id so the literal segment wins over the param route.
@@ -143,7 +148,7 @@ doctorsRouter.get(
       .filter((value) => typeof value === "string" && value.length > 0)
       .toSorted((a, b) => a.localeCompare(b));
     res.json({ data });
-  }),
+  })
 );
 
 doctorsRouter.post(
@@ -158,7 +163,7 @@ doctorsRouter.post(
     const created = await Doctor.create(parsed.data);
     const { _id, __v, ...doc } = created.toObject();
     res.status(201).json({ ...doc, patientCount: 0 });
-  }),
+  })
 );
 
 doctorsRouter.get(
@@ -169,13 +174,15 @@ doctorsRouter.get(
       sendValidationError(res, params.error);
       return;
     }
-    const doc = await Doctor.findOne({ id: params.data.id }).select("-_id -__v").lean();
+    const doc = await Doctor.findOne({ id: params.data.id })
+      .select("-_id -__v")
+      .lean();
     if (!doc) {
       res.status(404).json({ error: "Doctor not found" });
       return;
     }
-    res.json(await toDoctorItem(doc));
-  }),
+    res.json(toDoctorItem(doc));
+  })
 );
 
 doctorsRouter.patch(
@@ -195,7 +202,7 @@ doctorsRouter.patch(
     const doc = await Doctor.findOneAndUpdate(
       { id: params.data.id },
       { $set: parsed.data },
-      { returnDocument: "after" },
+      { returnDocument: "after" }
     )
       .select("-_id -__v")
       .lean();
@@ -203,8 +210,8 @@ doctorsRouter.patch(
       res.status(404).json({ error: "Doctor not found" });
       return;
     }
-    res.json(await toDoctorItem(doc));
-  }),
+    res.json(toDoctorItem(doc));
+  })
 );
 
 doctorsRouter.delete(
@@ -223,7 +230,7 @@ doctorsRouter.delete(
     }
     await Patient.deleteMany({ doctorId: params.data.id });
     res.status(204).end();
-  }),
+  })
 );
 
 doctorsRouter.get(
@@ -241,7 +248,9 @@ doctorsRouter.get(
     }
     const { condition, from, limit, page, search, sort, to } = parsed.data;
 
-    const doctor = await Doctor.findOne({ id: params.data.id }).select("-_id -__v").lean();
+    const doctor = await Doctor.findOne({ id: params.data.id })
+      .select("-_id -__v")
+      .lean();
     if (!doctor) {
       res.status(404).json({ error: "Doctor not found" });
       return;
@@ -283,5 +292,5 @@ doctorsRouter.get(
       ...result,
       data: result.data.map((patient) => ({ ...patient, doctor: embedded })),
     });
-  }),
+  })
 );

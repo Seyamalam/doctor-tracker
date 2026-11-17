@@ -11,7 +11,7 @@ export interface AuthConfig {
 export const createAuth = (
   env: AuthConfig,
   database: Database,
-  desktopOrigins: readonly string[] = [],
+  desktopOrigins: readonly string[] = []
 ) =>
   betterAuth({
     advanced: {

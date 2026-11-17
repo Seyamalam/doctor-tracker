@@ -12,6 +12,7 @@ import {
 } from "@ui-sdk/react/select";
 import { Download, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { selectContentCls, selectTriggerCls } from "@/components/form-fields";
 import { TablePagination } from "@/components/pagination";
@@ -31,7 +32,7 @@ export const SearchInput = ({ placeholder }: { placeholder: string }) => {
 
   const apply = useDebouncedCallback(
     (next: string) => setParams({ page: 1, search: next || null }),
-    { wait: 300 },
+    { wait: 300 }
   );
 
   return (
@@ -77,13 +78,18 @@ export const FilterSelect = ({
 }) => {
   const { get } = useTableParams();
   const setParams = useSetTableParams();
-  const allItems = [{ label: allLabel ?? `All ${label.toLowerCase()}s`, value: ALL }, ...items];
+  const allItems = [
+    { label: allLabel ?? `All ${label.toLowerCase()}s`, value: ALL },
+    ...items,
+  ];
   return (
     <div className="flex flex-col gap-1">
       <span className={labelCls}>{label}</span>
       <Select
         items={allItems}
-        onValueChange={(next) => setParams({ page: 1, [param]: next === ALL ? null : next })}
+        onValueChange={(next) =>
+          setParams({ page: 1, [param]: next === ALL ? null : next })
+        }
         value={get(param) || ALL}
       >
         <SelectTrigger
@@ -92,9 +98,17 @@ export const FilterSelect = ({
         >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className={selectContentCls} side="bottom" sideOffset={4}>
+        <SelectContent
+          className={selectContentCls}
+          side="bottom"
+          sideOffset={4}
+        >
           {allItems.map((item) => (
-            <SelectItem className={selectItemCls} key={item.value} value={item.value}>
+            <SelectItem
+              className={selectItemCls}
+              key={item.value}
+              value={item.value}
+            >
               <span className="min-w-0 truncate" title={item.label}>
                 {item.label}
               </span>
@@ -107,7 +121,11 @@ export const FilterSelect = ({
   );
 };
 
-export const SortSelect = ({ items }: { items: { value: string; label: string }[] }) => {
+export const SortSelect = ({
+  items,
+}: {
+  items: { value: string; label: string }[];
+}) => {
   const { sort } = useTableParams();
   const setParams = useSetTableParams();
   const allItems = [{ label: "Newest first", value: "default" }, ...items];
@@ -116,15 +134,28 @@ export const SortSelect = ({ items }: { items: { value: string; label: string }[
       <span className={labelCls}>Sort</span>
       <Select
         items={allItems}
-        onValueChange={(next) => setParams({ page: 1, sort: next === "default" ? null : next })}
+        onValueChange={(next) =>
+          setParams({ page: 1, sort: next === "default" ? null : next })
+        }
         value={sort || "default"}
       >
-        <SelectTrigger aria-label="Sort results" className={cx(selectTriggerCls, "w-40")}>
+        <SelectTrigger
+          aria-label="Sort results"
+          className={cx(selectTriggerCls, "w-40")}
+        >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className={selectContentCls} side="bottom" sideOffset={4}>
+        <SelectContent
+          className={selectContentCls}
+          side="bottom"
+          sideOffset={4}
+        >
           {allItems.map((item) => (
-            <SelectItem className={selectItemCls} key={item.value} value={item.value}>
+            <SelectItem
+              className={selectItemCls}
+              key={item.value}
+              value={item.value}
+            >
               <span className="min-w-0 truncate" title={item.label}>
                 {item.label}
               </span>
@@ -174,7 +205,11 @@ export const DateRangeFilters = () => {
   );
 };
 
-export const ExportCsvButton = ({ onExport }: { onExport: () => Promise<void> }) => {
+export const ExportCsvButton = ({
+  onExport,
+}: {
+  onExport: () => Promise<void>;
+}) => {
   const [busy, setBusy] = useState(false);
   return (
     <button
@@ -184,9 +219,10 @@ export const ExportCsvButton = ({ onExport }: { onExport: () => Promise<void> })
         setBusy(true);
         try {
           await onExport();
-        } finally {
-          setBusy(false);
+        } catch {
+          toast.error("Export failed — please try again");
         }
+        setBusy(false);
       }}
       type="button"
     >

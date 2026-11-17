@@ -93,19 +93,25 @@ describe("GET /api/stats", () => {
 
     expect(res.body.patientsPerDay).toHaveLength(30);
     const patientDayMap = new Map(
-      res.body.patientsPerDay.map((d: { count: number; date: string }) => [d.date, d.count]),
+      res.body.patientsPerDay.map((d: { count: number; date: string }) => [
+        d.date,
+        d.count,
+      ])
     );
     expect(patientDayMap.get(dayString(new Date(now)))).toBe(2);
     expect(patientDayMap.get(dayString(new Date(now - 3 * DAY_MS)))).toBe(1);
     const patientDaySum = res.body.patientsPerDay.reduce(
       (sum: number, d: { count: number }) => sum + d.count,
-      0,
+      0
     );
     expect(patientDaySum).toBe(3);
 
     expect(res.body.doctorsPerDay).toHaveLength(30);
     const doctorDayMap = new Map(
-      res.body.doctorsPerDay.map((d: { count: number; date: string }) => [d.date, d.count]),
+      res.body.doctorsPerDay.map((d: { count: number; date: string }) => [
+        d.date,
+        d.count,
+      ])
     );
     expect(doctorDayMap.get(dayString(new Date(now)))).toBe(1);
     expect(doctorDayMap.get(dayString(new Date(now - 5 * DAY_MS)))).toBe(1);

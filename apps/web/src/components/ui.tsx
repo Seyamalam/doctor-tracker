@@ -45,15 +45,30 @@ export const PageHeader = ({
     <div>
       <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
       {description ? (
-        <p className="text-muted-foreground mt-0.5 text-[13px]">{description}</p>
+        <p className="text-muted-foreground mt-0.5 text-[13px]">
+          {description}
+        </p>
       ) : null}
     </div>
-    {children ? <div className="flex items-center gap-2">{children}</div> : null}
+    {children ? (
+      <div className="flex items-center gap-2">{children}</div>
+    ) : null}
   </div>
 );
 
-export const Card = ({ children, className }: { children: ReactNode; className?: string }) => (
-  <section className={cx("rounded-xl border border-border bg-card p-5 shadow-sm", className)}>
+export const Card = ({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) => (
+  <section
+    className={cx(
+      "rounded-xl border border-border bg-card p-5 shadow-sm",
+      className
+    )}
+  >
     {children}
   </section>
 );
@@ -75,7 +90,9 @@ export const Badge = ({
   <span
     className={cx(
       badgeCls,
-      tone === "primary" ? "bg-primary/10 text-primary" : "bg-muted text-foreground",
+      tone === "primary"
+        ? "bg-primary/10 text-primary"
+        : "bg-muted text-foreground"
     )}
   >
     {children}
@@ -101,7 +118,9 @@ export const CellAvatar = ({
     aria-hidden="true"
     className={cx(
       "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold",
-      tone === "primary" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground",
+      tone === "primary"
+        ? "bg-primary/15 text-primary"
+        : "bg-muted text-muted-foreground"
     )}
   >
     {initialsOf(name)}
@@ -147,7 +166,9 @@ export const EmptyState = ({
   <div className="flex flex-col items-center gap-1.5 px-6 py-12 text-center">
     <p className="text-foreground text-sm font-medium">{title}</p>
     {description ? (
-      <p className="text-muted-foreground max-w-sm text-[13px]">{description}</p>
+      <p className="text-muted-foreground max-w-sm text-[13px]">
+        {description}
+      </p>
     ) : null}
     {action ? <div className="mt-3">{action}</div> : null}
   </div>

@@ -2,7 +2,13 @@ import type { MongoMemoryServer } from "mongodb-memory-server";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { anonApp, authedApp, connectTestDb, disconnectTestDb, viewerApp } from "./helpers";
+import {
+  anonApp,
+  authedApp,
+  connectTestDb,
+  disconnectTestDb,
+  viewerApp,
+} from "./helpers";
 
 let mongod: MongoMemoryServer;
 
@@ -25,8 +31,8 @@ describe("auth gate", () => {
     const app = anonApp();
     const responses = await Promise.all(
       ["/api/doctors", "/api/patients", "/api/stats", "/api/me"].map((path) =>
-        request(app).get(path),
-      ),
+        request(app).get(path)
+      )
     );
     for (const res of responses) {
       expect(res.status).toBe(401);
@@ -51,8 +57,8 @@ describe("role gate", () => {
     const app = viewerApp();
     const responses = await Promise.all(
       ["/api/doctors", "/api/patients", "/api/stats", "/api/me"].map((path) =>
-        request(app).get(path),
-      ),
+        request(app).get(path)
+      )
     );
     for (const res of responses) {
       expect(res.status).toBe(200);

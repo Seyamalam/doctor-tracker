@@ -53,7 +53,7 @@ export const toPaginated = <T>(
   data: T[],
   total: number,
   page: number,
-  limit: number,
+  limit: number
 ): Paginated<T> => ({
   data,
   limit,
@@ -68,7 +68,7 @@ export interface FacetResult<T> {
 }
 
 export interface AggregationModel {
-  aggregate<R>(pipeline: PipelineStage[]): PromiseLike<R[]>;
+  aggregate: <R>(pipeline: PipelineStage[]) => PromiseLike<R[]>;
 }
 
 // Runs match+sort stages once, then pages via $facet. Out-of-range pages are

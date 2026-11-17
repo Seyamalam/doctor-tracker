@@ -1,6 +1,11 @@
 "use client";
 
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import type { QueryKey } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -43,8 +48,8 @@ export const useDoctorOptions = () =>
       }
       const rest = await Promise.all(
         Array.from({ length: first.totalPages - 1 }, (_, i) =>
-          api.doctors.list({ limit: 50, page: i + 2 }),
-        ),
+          api.doctors.list({ limit: 50, page: i + 2 })
+        )
       );
       return {
         ...first,
@@ -64,7 +69,10 @@ export const useSpecializations = () =>
     staleTime: 60_000,
   });
 
-export const useDoctorPatients = (doctorId: string, params: DoctorPatientsParams) =>
+export const useDoctorPatients = (
+  doctorId: string,
+  params: DoctorPatientsParams
+) =>
   useQuery({
     placeholderData: keepPreviousData,
     queryFn: () => api.doctors.patients(doctorId, params),
@@ -120,7 +128,7 @@ export const useDeleteDoctor = () => {
       toastError(error, "Could not delete doctor");
     },
     onMutate: async (
-      id,
+      id
     ): Promise<{
       previous: [QueryKey, Paginated<Doctor> | undefined][];
     }> => {

@@ -4,8 +4,8 @@ A secure admin app for managing doctors and their patients. Sign in with email/p
 
 **Live demo:** [doctor-tracker-tau-sage.vercel.app](https://doctor-tracker-tau-sage.vercel.app)
 
-| Dashboard                                            | Doctors                                          | Patients                                           |
-| ---------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------- |
+| Dashboard | Doctors | Patients |
+| --- | --- | --- |
 | ![Dashboard](docs/screenshots/dashboard-desktop.png) | ![Doctors](docs/screenshots/doctors-desktop.png) | ![Patients](docs/screenshots/patients-desktop.png) |
 
 <details>
@@ -28,15 +28,15 @@ A secure admin app for managing doctors and their patients. Sign in with email/p
 
 ## Tech stack
 
-| Layer    | Choice                                                                                      |
-| -------- | ------------------------------------------------------------------------------------------- |
-| Frontend | Next.js 16 (App Router), React 19, Tailwind CSS 4                                           |
-| UI kit   | **ui-sdk** headless components (`@ui-sdk/react`), styled with Tailwind                      |
-| Data     | TanStack Query (server state), TanStack Table, TanStack Form + zod                          |
-| Charts   | Recharts                                                                                    |
-| Backend  | Express 5, zod validation, better-auth                                                      |
-| DB       | MongoDB Atlas + Mongoose                                                                    |
-| Tooling  | npm workspaces, vite-plus (dev/check/test), oxlint + oxfmt (Ultracite), varlock (typed env) |
+| Layer | Choice |
+| --- | --- |
+| Frontend | Next.js 16 (App Router), React 19, Tailwind CSS 4 |
+| UI kit | **ui-sdk** headless components (`@ui-sdk/react`), styled with Tailwind |
+| Data | TanStack Query (server state), TanStack Table, TanStack Form + zod |
+| Charts | Recharts |
+| Backend | Express 5, zod validation, better-auth |
+| DB | MongoDB Atlas + Mongoose |
+| Tooling | npm workspaces, vite-plus (dev/check/test), oxlint + oxfmt (Ultracite), varlock (typed env) |
 
 ### Why REST instead of tRPC?
 

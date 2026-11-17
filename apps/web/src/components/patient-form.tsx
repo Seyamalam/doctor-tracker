@@ -35,7 +35,10 @@ const PatientForm = ({
     label: `${doctor.name}, ${doctor.specialization}`,
     value: doctor.id,
   }));
-  if (patient?.doctor && !doctorItems.some((item) => item.value === patient.doctor?.id)) {
+  if (
+    patient?.doctor &&
+    !doctorItems.some((item) => item.value === patient.doctor?.id)
+  ) {
     doctorItems.unshift({
       label: `${patient.doctor.name}, ${patient.doctor.specialization}`,
       value: patient.doctor.id,
@@ -74,20 +77,37 @@ const PatientForm = ({
         form.handleSubmit();
       }}
     >
-      <form.Field name="name" validators={{ onChange: patientSchema.shape.name }}>
+      <form.Field
+        name="name"
+        validators={{ onChange: patientSchema.shape.name }}
+      >
         {(field) => <TextField field={field} label="Name" />}
       </form.Field>
-      <form.Field name="condition" validators={{ onChange: patientSchema.shape.condition }}>
-        {(field) => <TextField field={field} label="Condition" placeholder="e.g. Hypertension" />}
+      <form.Field
+        name="condition"
+        validators={{ onChange: patientSchema.shape.condition }}
+      >
+        {(field) => (
+          <TextField
+            field={field}
+            label="Condition"
+            placeholder="e.g. Hypertension"
+          />
+        )}
       </form.Field>
       {fixedDoctorId ? null : (
-        <form.Field name="doctorId" validators={{ onChange: patientSchema.shape.doctorId }}>
+        <form.Field
+          name="doctorId"
+          validators={{ onChange: patientSchema.shape.doctorId }}
+        >
           {(field) => (
             <SelectField
               field={field}
               items={doctorItems}
               label="Doctor"
-              placeholder={doctorOptions.isPending ? "Loading doctors…" : "Select a doctor"}
+              placeholder={
+                doctorOptions.isPending ? "Loading doctors…" : "Select a doctor"
+              }
             />
           )}
         </form.Field>
@@ -101,7 +121,11 @@ const PatientForm = ({
           })}
         >
           {({ canSubmit, isSubmitting }) => (
-            <Button className={btn.primary} disabled={!canSubmit || isSubmitting} type="submit">
+            <Button
+              className={btn.primary}
+              disabled={!canSubmit || isSubmitting}
+              type="submit"
+            >
               {isSubmitting ? "Saving…" : submitLabel}
             </Button>
           )}
@@ -127,7 +151,9 @@ export const PatientFormDialog = ({
   const baseDescription = patient
     ? "Update this patient's details."
     : "Add a patient and assign a doctor.";
-  const description = fixedDoctorName ? `Assigned to ${fixedDoctorName}.` : baseDescription;
+  const description = fixedDoctorName
+    ? `Assigned to ${fixedDoctorName}.`
+    : baseDescription;
 
   return (
     <FormDialog

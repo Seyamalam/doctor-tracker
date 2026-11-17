@@ -52,7 +52,9 @@ describe("POST /api/patients", () => {
   });
 
   it("400s on missing fields", async () => {
-    const res = await request(authedApp()).post("/api/patients").send({ name: "No Condition" });
+    const res = await request(authedApp())
+      .post("/api/patients")
+      .send({ name: "No Condition" });
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("Validation failed");
     expect(Array.isArray(res.body.issues)).toBe(true);
@@ -87,7 +89,9 @@ describe("GET /api/patients", () => {
     ]);
 
     const app = authedApp();
-    const byCondition = await request(app).get("/api/patients?condition=Asthma");
+    const byCondition = await request(app).get(
+      "/api/patients?condition=Asthma"
+    );
     expect(byCondition.body.total).toBe(1);
     expect(byCondition.body.data[0].name).toBe("Alice");
 
@@ -111,7 +115,9 @@ describe("GET /api/patients", () => {
       }),
     ]);
     const from = new Date(now - 5 * 86_400_000).toISOString();
-    const res = await request(authedApp()).get(`/api/patients?from=${encodeURIComponent(from)}`);
+    const res = await request(authedApp()).get(
+      `/api/patients?from=${encodeURIComponent(from)}`
+    );
     expect(res.body.total).toBe(1);
   });
 });

@@ -31,7 +31,12 @@ export const useSetTableParams = () => {
         const isDefault =
           (key === "page" && Number(value) === 1) ||
           (key === "limit" && Number(value) === DEFAULT_PAGE_SIZE);
-        if (value === null || value === undefined || value === "" || isDefault) {
+        if (
+          value === null ||
+          value === undefined ||
+          value === "" ||
+          isDefault
+        ) {
           params.delete(key);
         } else {
           params.set(key, String(value));
@@ -40,6 +45,6 @@ export const useSetTableParams = () => {
       const query = params.toString();
       router.replace(`${pathname}${query ? `?${query}` : ""}` as Route);
     },
-    [pathname, router, searchParams],
+    [pathname, router, searchParams]
   );
 };

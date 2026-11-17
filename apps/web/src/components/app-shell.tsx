@@ -17,10 +17,10 @@ import {
   Users,
 } from "lucide-react";
 import type { Route } from "next";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
 import { backdropCls } from "@/components/dialogs";
 import { Logo } from "@/components/logo";
@@ -29,6 +29,19 @@ import { btn, cx, popupAnimCls, popupCls } from "@/components/ui";
 import UserMenu from "@/components/user-menu";
 
 const COLLAPSED_KEY = "dt.sidebar.collapsed";
+const COLLAPSED_EVENT = "dt:sidebar-toggle";
+
+const subscribeCollapsed = (onChange: () => void) => {
+  window.addEventListener(COLLAPSED_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener(COLLAPSED_EVENT, onChange);
+    window.removeEventListener("storage", onChange);
+  };
+};
+
+const readCollapsed = () => window.localStorage.getItem(COLLAPSED_KEY) === "1";
+const readCollapsedServer = () => false;
 
 const links = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
@@ -36,7 +49,8 @@ const links = [
   { icon: Users, label: "Patients", to: "/patients" },
 ] as const;
 
-const isActive = (pathname: string, to: string) => pathname === to || pathname.startsWith(`${to}/`);
+const isActive = (pathname: string, to: string) =>
+  pathname === to || pathname.startsWith(`${to}/`);
 
 const isEditableTarget = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
@@ -47,13 +61,15 @@ const isEditableTarget = (target: EventTarget | null) =>
 
 const Brand = ({ collapsed }: { collapsed?: boolean }) => (
   <Link
-    className="flex items-center gap-2.5 rounded-md px-2 py-1.5 transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+    className="focus-visible:outline-ring flex items-center gap-2.5 rounded-md px-2 py-1.5 transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2"
     href="/dashboard"
   >
     <Logo className="h-7 w-7 shrink-0" />
     {collapsed ? null : (
       <span className="flex min-w-0 flex-col">
-        <span className="text-sm font-semibold tracking-tight">Doctor Tracker</span>
+        <span className="text-sm font-semibold tracking-tight">
+          Doctor Tracker
+        </span>
         <span className="text-muted-foreground text-[11px]">Admin console</span>
       </span>
     )}
@@ -85,7 +101,7 @@ const NavLink = ({
         collapsed ? "justify-center px-0" : "px-3",
         active
           ? "bg-primary/10 text-primary"
-          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          : "text-muted-foreground hover:bg-muted hover:text-foreground"
       )}
       href={to as Route}
       onClick={onNavigate}
@@ -95,7 +111,7 @@ const NavLink = ({
         className={cx(
           "absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-primary transition-opacity duration-150 motion-reduce:transition-none",
           active ? "opacity-100" : "opacity-0",
-          collapsed && "left-[-3px]",
+          collapsed && "left-[-3px]"
         )}
       />
       <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
@@ -108,7 +124,10 @@ const NavLink = ({
   return (
     <Tooltip>
       <TooltipTrigger render={link} />
-      <TooltipContent className={cx(popupCls, popupAnimCls, "px-2.5 py-1.5 text-xs")} side="right">
+      <TooltipContent
+        className={cx(popupCls, popupAnimCls, "px-2.5 py-1.5 text-xs")}
+        side="right"
+      >
         {label}
       </TooltipContent>
     </Tooltip>
@@ -126,7 +145,7 @@ const NavList = ({
 }) => (
   <nav aria-label="Main" className="flex flex-col gap-1">
     {collapsed ? null : (
-      <p className="text-muted-foreground px-3 pb-1.5 text-[11px] font-medium uppercase tracking-[0.08em]">
+      <p className="text-muted-foreground px-3 pb-1.5 text-[11px] font-medium tracking-[0.08em] uppercase">
         Workspace
       </p>
     )}
@@ -150,22 +169,26 @@ const drawerCls =
 const AppShell = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const collapsed = useSyncExternalStore(
+    subscribeCollapsed,
+    readCollapsed,
+    readCollapsedServer
+  );
   const { resolvedTheme, setTheme } = useTheme();
 
-  useEffect(() => {
-    setCollapsed(window.localStorage.getItem(COLLAPSED_KEY) === "1");
+  const toggleCollapsed = useCallback(() => {
+    window.localStorage.setItem(COLLAPSED_KEY, readCollapsed() ? "0" : "1");
+    window.dispatchEvent(new Event(COLLAPSED_EVENT));
   }, []);
-
-  const toggleCollapsed = () =>
-    setCollapsed((value) => {
-      window.localStorage.setItem(COLLAPSED_KEY, value ? "0" : "1");
-      return !value;
-    });
 
   useEffect(() => {
     const onKeydown = (event: KeyboardEvent) => {
-      if (event.metaKey || event.ctrlKey || event.altKey || isEditableTarget(event.target)) {
+      if (
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        isEditableTarget(event.target)
+      ) {
         return;
       }
       if (event.key === "b") {
@@ -176,7 +199,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
     };
     window.addEventListener("keydown", onKeydown);
     return () => window.removeEventListener("keydown", onKeydown);
-  }, [resolvedTheme, setTheme]);
+  }, [resolvedTheme, setTheme, toggleCollapsed]);
 
   if (pathname === "/login") {
     return children;
@@ -189,7 +212,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
       <aside
         className={cx(
           "bg-card border-border fixed inset-y-0 left-0 z-30 hidden flex-col border-r transition-[width] duration-200 ease-out motion-reduce:transition-none lg:flex",
-          collapsed ? "w-16" : "w-64",
+          collapsed ? "w-16" : "w-64"
         )}
       >
         <div className={cx("pb-4 pt-5", collapsed ? "px-3" : "px-4")}>
@@ -201,7 +224,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
         <div
           className={cx(
             "border-border flex items-center gap-1 border-t p-3",
-            collapsed ? "flex-col" : "justify-between",
+            collapsed ? "flex-col" : "justify-between"
           )}
         >
           <UserMenu compact={collapsed} />
@@ -232,7 +255,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
         </div>
       </aside>
 
-      <div className="border-border bg-card sticky top-0 z-30 flex h-14 items-center gap-2 border-b px-3 pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] lg:hidden">
+      <div className="border-border bg-card sticky top-0 z-30 flex h-14 items-center gap-2 border-b px-3 pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] lg:hidden">
         <Dialog onOpenChange={setDrawerOpen} open={drawerOpen}>
           <DialogTrigger
             aria-expanded={drawerOpen}
@@ -262,7 +285,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
       <div
         className={cx(
           "transition-[padding] duration-200 ease-out motion-reduce:transition-none",
-          collapsed ? "lg:pl-16" : "lg:pl-64",
+          collapsed ? "lg:pl-16" : "lg:pl-64"
         )}
       >
         {children}

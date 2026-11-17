@@ -29,7 +29,12 @@ const UserMenu = ({ compact }: { compact?: boolean }) => {
 
   if (isPending) {
     return (
-      <div className={cx("skeleton", compact ? "h-9 w-9 rounded-full" : "h-11 w-full min-w-36")} />
+      <div
+        className={cx(
+          "skeleton",
+          compact ? "h-9 w-9 rounded-full" : "h-11 w-full min-w-36"
+        )}
+      />
     );
   }
 
@@ -55,7 +60,7 @@ const UserMenu = ({ compact }: { compact?: boolean }) => {
         aria-label={`Account menu for ${session.user.name}`}
         className={cx(
           "hover:bg-muted focus-visible:outline-ring flex min-w-0 items-center gap-2.5 rounded-lg text-left transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none",
-          compact ? "justify-center p-1.5" : "flex-1 px-2 py-1.5",
+          compact ? "justify-center p-1.5" : "flex-1 px-2 py-1.5"
         )}
       >
         <span

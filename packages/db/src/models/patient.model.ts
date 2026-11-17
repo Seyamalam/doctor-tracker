@@ -28,7 +28,7 @@ const patientSchema = new Schema(
     collection: "patient",
     id: false,
     timestamps: true,
-  },
+  }
 );
 
 patientSchema.index({ createdAt: -1, doctorId: 1 });

@@ -76,7 +76,9 @@ export const ConfirmDialog = ({
   <AlertDialog onOpenChange={onOpenChange} open={open}>
     <AlertDialogBackdrop className={backdropCls} />
     <AlertDialogContent className={dialogContentCls}>
-      <AlertDialogTitle className="text-base font-semibold">{title}</AlertDialogTitle>
+      <AlertDialogTitle className="text-base font-semibold">
+        {title}
+      </AlertDialogTitle>
       <AlertDialogDescription className="text-muted-foreground text-[13px]">
         {description}
       </AlertDialogDescription>
