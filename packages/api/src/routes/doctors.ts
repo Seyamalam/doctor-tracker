@@ -46,11 +46,14 @@ const idParamsSchema = z.object({
 });
 
 const createDoctorSchema = z.object({
-  email: z.email(),
-  hospital: z.string().trim().min(1),
-  name: z.string().trim().min(1),
-  phone: z.string().trim().min(1),
-  specialization: z.string().trim().min(1),
+  email: z.email().max(254),
+  hospital: z.string().trim().min(2).max(200),
+  name: z.string().trim().min(2).max(120),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^[\d\s()+.-]{7,30}$/u),
+  specialization: z.string().trim().min(2).max(120),
 });
 
 const updateDoctorSchema = createDoctorSchema.partial();

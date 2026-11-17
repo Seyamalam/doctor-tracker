@@ -192,7 +192,7 @@ describe("PATCH /api/doctors/:id", () => {
   it("404s on a missing doctor", async () => {
     const res = await request(authedApp())
       .patch(`/api/doctors/${makeDoctor(99).id}`)
-      .send({ hospital: "X" });
+      .send({ hospital: "XX" });
     expect(res.status).toBe(404);
   });
 });

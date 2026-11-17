@@ -31,9 +31,9 @@ const idParamsSchema = z.object({
 });
 
 const createPatientSchema = z.object({
-  condition: z.string().trim().min(1),
-  doctorId: z.string().trim().min(1),
-  name: z.string().trim().min(1),
+  condition: z.string().trim().min(2).max(160),
+  doctorId: z.string().trim().min(1).max(64),
+  name: z.string().trim().min(2).max(120),
 });
 
 const updatePatientSchema = createPatientSchema.partial();
