@@ -11,10 +11,7 @@ A secure admin app for managing doctors and their patients. Sign in with email/p
 <details>
 <summary>Mobile &amp; tablet views</summary>
 
-![Dashboard mobile](docs/screenshots/dashboard-mobile.png)
-![Doctors mobile](docs/screenshots/doctors-mobile.png)
-![Patients mobile](docs/screenshots/patients-mobile.png)
-![Dashboard tablet](docs/screenshots/dashboard-tablet.png)
+![Dashboard mobile](docs/screenshots/dashboard-mobile.png) ![Doctors mobile](docs/screenshots/doctors-mobile.png) ![Patients mobile](docs/screenshots/patients-mobile.png) ![Dashboard tablet](docs/screenshots/dashboard-tablet.png)
 
 </details>
 

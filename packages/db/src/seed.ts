@@ -20,7 +20,7 @@ const mulberry32 = (seed: number) => () => {
   return ((t ^ (t >>> 14)) >>> 0) / 4_294_967_296;
 };
 
-const rand = mulberry32(0x51_33_7);
+const rand = mulberry32(0x5_13_37);
 
 const pick = <T>(items: readonly T[]): T => items[Math.floor(rand() * items.length)] as T;
 
@@ -278,7 +278,9 @@ const buildPatients = (doctors: DoctorSeed[], now: number) => {
 };
 
 const insertChunked = async <T extends object>(
-  model: { insertMany: (docs: T[], options: { timestamps: boolean }) => Promise<unknown> },
+  model: {
+    insertMany: (docs: T[], options: { timestamps: boolean }) => Promise<unknown>;
+  },
   docs: T[],
 ): Promise<void> => {
   for (let start = 0; start < docs.length; start += INSERT_CHUNK) {

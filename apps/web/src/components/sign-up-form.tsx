@@ -98,7 +98,7 @@ const SignUpForm = ({ onSwitchToSignIn }: { onSwitchToSignIn: () => void }) => {
       </form.Subscribe>
       <p className="text-muted-foreground text-center text-[13px]">
         <button
-          className="text-primary rounded font-medium hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="text-primary focus-visible:outline-ring rounded font-medium hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
           onClick={onSwitchToSignIn}
           type="button"
         >

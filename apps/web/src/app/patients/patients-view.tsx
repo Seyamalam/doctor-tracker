@@ -65,7 +65,12 @@ export const PatientsView = () => {
   const [deleteTarget, setDeleteTarget] = useState<Patient | null>(null);
 
   const columns = useMemo(
-    () => patientColumns({ canMutate: isAdmin, onDelete: setDeleteTarget, onEdit: setFormTarget }),
+    () =>
+      patientColumns({
+        canMutate: isAdmin,
+        onDelete: setDeleteTarget,
+        onEdit: setFormTarget,
+      }),
     [isAdmin],
   );
   const table = useTable({

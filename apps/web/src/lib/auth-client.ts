@@ -9,7 +9,9 @@ export const authClient = createAuthClient({
   baseURL: (boundServerUrl ?? ENV.NEXT_PUBLIC_SERVER_URL) || undefined,
   plugins: [
     inferAdditionalFields({
-      user: { role: { defaultValue: "admin", required: false, type: "string" } },
+      user: {
+        role: { defaultValue: "admin", required: false, type: "string" },
+      },
     }),
   ],
 });

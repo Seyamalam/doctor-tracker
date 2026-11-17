@@ -11,7 +11,9 @@ import { serverEnv } from "./env.server";
 import { auth } from "./services";
 
 const FIFTEEN_MINUTES_MS = 15 * 60 * 1000;
-const RATE_LIMIT_MESSAGE = { error: "Too many requests, please try again later." };
+const RATE_LIMIT_MESSAGE = {
+  error: "Too many requests, please try again later.",
+};
 
 const app = express();
 

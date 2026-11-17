@@ -46,7 +46,10 @@ export const useDoctorOptions = () =>
           api.doctors.list({ limit: 50, page: i + 2 }),
         ),
       );
-      return { ...first, data: [...first.data, ...rest.flatMap((page) => page.data)] };
+      return {
+        ...first,
+        data: [...first.data, ...rest.flatMap((page) => page.data)],
+      };
     },
     queryKey: ["doctors", "options"],
     select: (result) => result.data,

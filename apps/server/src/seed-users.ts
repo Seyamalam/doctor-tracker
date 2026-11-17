@@ -4,7 +4,12 @@ import { serverEnv } from "./env.server";
 import { auth } from "./services";
 
 const DEMO_ACCOUNTS = [
-  { email: "admin@doctor-tracker.dev", name: "Demo Admin", password: "Admin1234!", role: "admin" },
+  {
+    email: "admin@doctor-tracker.dev",
+    name: "Demo Admin",
+    password: "Admin1234!",
+    role: "admin",
+  },
   {
     email: "viewer@doctor-tracker.dev",
     name: "Demo Viewer",

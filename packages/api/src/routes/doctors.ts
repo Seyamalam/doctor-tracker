@@ -14,8 +14,8 @@ import {
   sendValidationError,
   sortParam,
 } from "../lib/listing";
-import { requireAdmin } from "../middleware/require-role";
 import type { PatientWithDoctor } from "../lib/patient-projection";
+import { requireAdmin } from "../middleware/require-role";
 
 const SORTABLE_FIELDS = [
   "createdAt",
@@ -139,7 +139,11 @@ doctorsRouter.get(
             ],
           },
         },
-        { $addFields: { patientCount: { $ifNull: [{ $first: "$patients.count" }, 0] } } },
+        {
+          $addFields: {
+            patientCount: { $ifNull: [{ $first: "$patients.count" }, 0] },
+          },
+        },
         { $sort: parseSort(sort) },
       ],
     });

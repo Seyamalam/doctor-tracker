@@ -17,7 +17,10 @@ export const generateMetadata = async ({
   const cookie = (await headers()).get("cookie") ?? "";
   try {
     const doctor = await api.doctors.get(id, { headers: { cookie } });
-    return { description: `${doctor.specialization} at ${doctor.hospital}`, title: doctor.name };
+    return {
+      description: `${doctor.specialization} at ${doctor.hospital}`,
+      title: doctor.name,
+    };
   } catch {
     return { title: "Doctor" };
   }

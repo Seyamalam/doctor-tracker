@@ -14,9 +14,9 @@ import {
   sendValidationError,
   sortParam,
 } from "../lib/listing";
-import { requireAdmin } from "../middleware/require-role";
 import type { EmbeddedDoctor, PatientWithDoctor } from "../lib/patient-projection";
 import { doctorEmbedStages } from "../lib/patient-projection";
+import { requireAdmin } from "../middleware/require-role";
 
 const SORTABLE_FIELDS = ["condition", "createdAt", "doctorId", "name", "updatedAt"] as const;
 
