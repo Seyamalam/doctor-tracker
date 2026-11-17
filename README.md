@@ -26,6 +26,8 @@ A secure admin app for managing doctors and their patients. Sign in with email/p
 - **Patients** — list with search (name/condition), condition and doctor filters, sort, pagination; each row embeds its doctor and links to the detail page; create/edit/delete with doctor reassignment.
 - **Dashboard** — totals (doctors, patients, new this month), 30-day activity chart, top-5 conditions pie, busiest specializations, recent patients.
 - **Responsive + accessible** — tables scroll safely on mobile, coarse-pointer touch targets, focus-visible rings, `prefers-reduced-motion` support, dark mode.
+- **SEO** — full `Metadata` API coverage (per-page titles, dynamic doctor titles), generated Open Graph + Twitter card images, `robots.txt`, `sitemap.xml`, theme colour + viewport config.
+- **Hardened API** — helmet security headers, gzip compression, rate limiting (`/api/auth` 200/15min, `/api` 1000/15min), 100kb JSON body cap, centralized error/404 handling, graceful shutdown on SIGTERM/SIGINT.
 
 ## Tech stack
 
@@ -104,7 +106,9 @@ cp apps/web/.env.example apps/web/.env
 ### Seed + run
 
 ```bash
-npm run seed -w @doctor-tracker/db   # 15 doctors, 60 patients into Atlas
+npm run seed -w @doctor-tracker/db   # 50 doctors, 500 patients (Bangladeshi demo
+                                     # data) into Atlas — wipe + reseed; volume is
+                                     # tunable via SEED_DOCTORS / SEED_PATIENTS
 npm run seed:users -w server         # demo admin + viewer accounts
 npm run dev                          # web :3001 + server :3000
 ```
@@ -115,7 +119,7 @@ Open http://localhost:3001 — you'll be redirected to `/login`; create an accou
 
 ```bash
 npm run check    # format + lint + typecheck across workspaces
-npx vp test      # 37 route tests (mongodb-memory-server): auth gate,
+npx vp test      # 42 route tests (mongodb-memory-server): auth + role gates,
                  # validation, pagination, doctor/patient CRUD, stats
 ```
 
@@ -126,7 +130,7 @@ npx vp test      # 37 route tests (mongodb-memory-server): auth gate,
 - **`server`** (`apps/server`, Express) — internal except `/api/*`
 - **`web`** (`apps/web`, Next.js) — public on `/(.*)`, with a `SERVER_URL` service binding for server-side auth calls
 
-Top-level rewrites route `/api/(.*)` → `server`, everything else → `web`. In production the browser calls **same-origin** `/api` (no CORS), so `NEXT_PUBLIC_SERVER_URL` should be left unset in Vercel. Set on the project: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` = public site URL, `CORS_ORIGIN` = same public URL, `_VARLOCK_ENV_KEY` (varlock build encryption key — `npx varlock generate-key`).
+Top-level rewrites route `/api/(.*)` → `server`, everything else → `web`. In production the browser calls **same-origin** `/api` (no CORS), so `NEXT_PUBLIC_SERVER_URL` should be left unset in Vercel. Set on the project: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` = public site URL, `CORS_ORIGIN` = same public URL, `NEXT_PUBLIC_APP_URL` = same public URL (canonical `og:url`/`metadataBase`), `_VARLOCK_ENV_KEY` (varlock build encryption key — `npx varlock generate-key`).
 
 On Vercel the server bypasses varlock at runtime (no CLI in the function bundle) and reads `process.env` directly; locally `varlock/auto-load` still resolves `.env` files.
 
