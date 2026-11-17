@@ -29,14 +29,14 @@ The full docs are the Agents pages: `docs/agents.md` in each package, or https:/
    agent: { actions: ["rate"] },
    ```
 
-   | Key                         | Use it when                                                                                                                         |
-   | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-   | `actions`                   | Always. The api methods an agent may call. Without it, only methods named like `setValue`, `open`, `toggle` or `clear` are offered. |
-   | `closed: true`              | The value is always one of its items, like a size picker. A step that names another item is refused with the real ones.             |
-   | `items: (api) => …`         | The items aren't in the state's `items`. Return `{ value, label }` objects.                                                         |
-   | `reveals: true`             | Closed items hide other components, like tabs or an accordion.                                                                      |
-   | `shown: (state) => boolean` | It only matters sometimes, like a field wrapper while it has errors.                                                                |
-   | `secret: true`              | Its value must never be read, like a PIN.                                                                                           |
+   | Key | Use it when |
+   | --- | --- |
+   | `actions` | Always. The api methods an agent may call. Without it, only methods named like `setValue`, `open`, `toggle` or `clear` are offered. |
+   | `closed: true` | The value is always one of its items, like a size picker. A step that names another item is refused with the real ones. |
+   | `items: (api) => …` | The items aren't in the state's `items`. Return `{ value, label }` objects. |
+   | `reveals: true` | Closed items hide other components, like tabs or an accordion. |
+   | `shown: (state) => boolean` | It only matters sometimes, like a field wrapper while it has errors. |
+   | `secret: true` | Its value must never be read, like a PIN. |
 
 ## Connect the bridge
 
@@ -51,14 +51,14 @@ Create the bridge once, in the browser, from the same package as the components:
 | Web components | `import { createAgent } from "@ui-sdk/web/agent"`    |
 
 ```ts
-import { agentTools, createAgent, registerTools } from "@ui-sdk/react/agent"
+import { agentTools, createAgent, registerTools } from "@ui-sdk/react/agent";
 
 const agent = createAgent({
   allow: (step, { signal }) =>
     step.confirm ? askThePerson(step.confirm, { signal }) : true,
-})
+});
 
-export { agent }
+export { agent };
 ```
 
 - `agent.snapshot()` lists the components, their state and their `actions`. `agent.act({ steps })` runs steps in order. `agent.query({ text, within, kind })` finds components and list items.
@@ -72,27 +72,27 @@ export { agent }
 Write this test for every interface you build. It runs in jsdom with the framework's testing library, after the [jsdom stubs](testing.md#jsdom), since a Select opens to resolve an item by its label. This is React; the other frameworks render the same way their own tests do:
 
 ```tsx
-import { render, screen } from "@testing-library/react"
-import { createAgent } from "@ui-sdk/react/agent"
-import { expect, test } from "vitest"
-import { ProjectSettings } from "./project-settings"
+import { render, screen } from "@testing-library/react";
+import { createAgent } from "@ui-sdk/react/agent";
+import { expect, test } from "vitest";
+import { ProjectSettings } from "./project-settings";
 
 test("an agent can find and change every setting", async () => {
-  const agent = createAgent()
-  render(<ProjectSettings />)
+  const agent = createAgent();
+  render(<ProjectSettings />);
 
   const components = agent
     .snapshot()
-    .filter((entry) => !entry.offPage && entry.component !== "more")
+    .filter((entry) => !entry.offPage && entry.component !== "more");
   for (const entry of components) {
     expect(
       entry.label,
       `${entry.component} ${entry.ref} has no name`
-    ).toBeTruthy()
+    ).toBeTruthy();
   }
-  const labels = components.map((entry) => entry.label)
+  const labels = components.map((entry) => entry.label);
   for (const label of ["Project name", "Visibility", "Weekly digest"]) {
-    expect(labels, `${label} is missing from the snapshot`).toContain(label)
+    expect(labels, `${label} is missing from the snapshot`).toContain(label);
   }
 
   const result = await agent.act({
@@ -100,12 +100,12 @@ test("an agent can find and change every setting", async () => {
       { ref: "Project name", action: "setValue", args: ["Atlas"] },
       { ref: "Visibility", action: "setValue", args: ["Internal"] },
     ],
-  })
-  expect(result.ok, result.error?.message).toBe(true)
+  });
+  expect(result.ok, result.error?.message).toBe(true);
   expect(screen.getByLabelText<HTMLInputElement>("Project name").value).toBe(
     "Atlas"
-  )
-})
+  );
+});
 ```
 
 - The entry with `component: "more"` comes last when the page has more than 100 components, and says how many `query` can find.
@@ -115,17 +115,17 @@ test("an agent can find and change every setting", async () => {
 - For a `data-agent-confirm` control, give the file's one bridge an `allow` you can flip, and assert the step is refused, then runs:
 
   ```ts
-  let approve = false
-  const agent = createAgent({ allow: (step) => !step.confirm || approve })
+  let approve = false;
+  const agent = createAgent({ allow: (step) => !step.confirm || approve });
   const remove = {
     steps: [
       { ref: "Delete project", action: "press", args: ["Delete forever"] },
     ],
-  }
+  };
 
-  expect((await agent.act(remove)).ok).toBe(false)
-  approve = true
-  expect((await agent.act(remove)).ok).toBe(true)
+  expect((await agent.act(remove)).ok).toBe(false);
+  approve = true;
+  expect((await agent.act(remove)).ok).toBe(true);
   ```
 
 - A refused press closes the dialog it opened before `act` returns.

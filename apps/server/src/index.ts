@@ -14,7 +14,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     origin: ENV.CORS_ORIGIN,
-  })
+  }),
 );
 
 app.all("/api/auth{/*path}", toNodeHandler(auth));

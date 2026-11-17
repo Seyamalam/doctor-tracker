@@ -13,7 +13,7 @@ const userSchema = new Schema(
     name: { required: true, type: String },
     updatedAt: { default: Date.now, required: true, type: Date },
   },
-  { collection: "user" }
+  { collection: "user" },
 );
 
 const sessionSchema = new Schema(
@@ -27,7 +27,7 @@ const sessionSchema = new Schema(
     userAgent: { type: String },
     userId: { ref: "User", required: true, type: ObjectId },
   },
-  { collection: "session" }
+  { collection: "session" },
 );
 sessionSchema.index({ userId: 1 });
 
@@ -47,7 +47,7 @@ const accountSchema = new Schema(
     updatedAt: { default: Date.now, required: true, type: Date },
     userId: { ref: "User", required: true, type: ObjectId },
   },
-  { collection: "account" }
+  { collection: "account" },
 );
 accountSchema.index({ accountId: 1, providerId: 1 }, { unique: true });
 accountSchema.index({ userId: 1 });
@@ -61,7 +61,7 @@ const verificationSchema = new Schema(
     updatedAt: { default: Date.now, required: true, type: Date },
     value: { required: true, type: String },
   },
-  { collection: "verification" }
+  { collection: "verification" },
 );
 verificationSchema.index({ identifier: 1 });
 
