@@ -107,7 +107,7 @@ const NavLink = ({
       aria-current={active ? "page" : undefined}
       aria-label={collapsed ? label : undefined}
       className={cx(
-        "group relative flex h-10 items-center gap-2.5 rounded-lg font-medium text-sm transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transition-none",
+        "group relative flex h-10 items-center gap-2.5 rounded-lg border-0 font-medium text-sm transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transition-none",
         collapsed ? "justify-center px-0" : "px-3",
         active
           ? "bg-primary/10 text-primary"
@@ -187,7 +187,7 @@ const CollapseButton = ({
     <TooltipTrigger
       aria-keyshortcuts="b"
       aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-      className={btn.icon}
+      className={cx(btn.icon, collapsed && "h-10 w-10")}
       onClick={onToggle}
       type="button"
     >
@@ -332,7 +332,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           <div className={collapsed ? undefined : "min-w-0 flex-1"}>
             {collapsed ? <CollapsedUserMenu /> : <UserMenu />}
           </div>
-          <ModeToggle />
+          <ModeToggle className={collapsed ? "h-10 w-10" : undefined} />
         </div>
       </aside>
 

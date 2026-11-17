@@ -89,7 +89,7 @@ const AccountMenu = ({
 };
 
 const triggerBase =
-  "hover:bg-muted focus-visible:outline-ring flex min-w-0 items-center gap-2.5 rounded-lg text-left transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none";
+  "focus-visible:outline-ring flex min-w-0 items-center gap-2.5 rounded-lg border-0 text-left transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none";
 
 const useSessionUser = () => {
   const { data: session, isPending } = authClient.useSession();
@@ -110,7 +110,10 @@ const UserMenu = () => {
     <AccountMenu side="top" user={user}>
       <MenuTrigger
         aria-label={`Account menu for ${user.name}`}
-        className={cx(triggerBase, "flex-1 px-2 py-1.5")}
+        className={cx(
+          triggerBase,
+          "bg-primary/10 hover:bg-primary/15 flex-1 px-2 py-1.5"
+        )}
       >
         <Avatar name={user.name} />
         <span className="flex min-w-0 flex-1 flex-col">
@@ -144,7 +147,7 @@ const CollapsedUserMenu = () => {
     <AccountMenu side="right" user={user}>
       <MenuTrigger
         aria-label={`Account menu for ${user.name}`}
-        className={cx(triggerBase, "justify-center p-1.5")}
+        className={cx(triggerBase, "hover:bg-muted h-10 w-10 justify-center")}
       >
         <Avatar name={user.name} />
       </MenuTrigger>

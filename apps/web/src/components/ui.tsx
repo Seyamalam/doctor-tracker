@@ -10,7 +10,7 @@ export const btn = {
   danger: `${btnBase} h-9 bg-danger px-4 text-danger-foreground text-sm hover:bg-danger/90 coarse:h-10`,
   dangerGhost: `${btnBase} h-9 px-3 text-danger text-sm hover:bg-danger/10 coarse:h-10`,
   ghost: `${btnBase} h-9 px-3 text-foreground text-sm hover:bg-muted coarse:h-10`,
-  icon: `${btnBase} h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground coarse:h-10 coarse:w-10`,
+  icon: `${btnBase} h-8 w-8 border-0 text-muted-foreground hover:bg-muted hover:text-foreground coarse:h-10 coarse:w-10`,
   outline: `${btnBase} h-9 border border-border bg-card px-4 text-foreground text-sm hover:bg-muted coarse:h-10`,
   primary: `${btnBase} h-9 bg-primary px-4 text-primary-foreground text-sm hover:bg-primary/90 coarse:h-10`,
 };

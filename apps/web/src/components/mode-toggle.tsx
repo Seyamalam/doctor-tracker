@@ -6,12 +6,15 @@ import { useTheme } from "next-themes";
 
 import { btn, cx, menuItemCls, popupAnimCls, popupCls } from "@/components/ui";
 
-export const ModeToggle = () => {
+export const ModeToggle = ({ className }: { className?: string }) => {
   const { setTheme } = useTheme();
 
   return (
     <Menu onAction={(value) => setTheme(value)}>
-      <MenuTrigger aria-label="Toggle theme" className={btn.icon}>
+      <MenuTrigger
+        aria-label="Toggle theme"
+        className={cx(btn.icon, className)}
+      >
         <span className="relative flex h-4 w-4 items-center justify-center">
           <Sun className="absolute h-4 w-4 scale-100 rotate-0 transition-[rotate,scale] duration-150 motion-reduce:transition-none dark:scale-0 dark:-rotate-90" />
           <Moon className="absolute h-4 w-4 scale-0 rotate-90 transition-[rotate,scale] duration-150 motion-reduce:transition-none dark:scale-100 dark:rotate-0" />
