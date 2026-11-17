@@ -3,7 +3,7 @@ import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import express from "express";
 
-import { ENV } from "./env.server";
+import { serverEnv } from "./env.server";
 import { auth } from "./services";
 
 const app = express();
@@ -13,7 +13,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    origin: ENV.CORS_ORIGIN,
+    origin: serverEnv.CORS_ORIGIN,
   }),
 );
 

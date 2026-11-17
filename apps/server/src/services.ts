@@ -1,7 +1,7 @@
 import { createAuth } from "@doctor-tracker/auth";
 import { createDb } from "@doctor-tracker/db";
 
-import { ENV } from "./env.server";
+import { serverEnv } from "./env.server";
 
-export const db = await createDb(ENV);
-export const auth = createAuth(ENV, db);
+export const db = await createDb(serverEnv);
+export const auth = createAuth(serverEnv, db);
