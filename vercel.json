@@ -4,12 +4,12 @@
     "server": {
       "root": "apps/server",
       "framework": "express",
-      "installCommand": "cd ../.. && npm install"
+      "installCommand": "cd ../.. && npm install --include=dev"
     },
     "web": {
       "root": "apps/web",
       "framework": "nextjs",
-      "installCommand": "cd ../.. && npm install",
+      "installCommand": "cd ../.. && npm install --include=dev",
       "bindings": [
         {
           "type": "service",
