@@ -11,21 +11,21 @@ Components render no styles of their own. `@ui-sdk/core/web.css` is an optional 
 
 ### Tokens
 
-| Token | What it drives |
-| --- | --- |
-| `--ui-background`, `--ui-foreground` | Page, field and popup surfaces, and their text |
-| `--ui-muted`, `--ui-muted-foreground` | Hover and selected fills; hints, placeholders and secondary text |
-| `--ui-border` | Dividers and popup edges |
-| `--ui-input` | Borders of inputs, selects, checkboxes, buttons and the empty part of a track or rating |
-| `--ui-primary`, `--ui-primary-foreground` | Checked, pressed and filled states, and the text on them |
-| `--ui-destructive` | Errors and invalid borders |
-| `--ui-ring`, `--ui-ring-border` | The focus outline, and a field's border while it has focus |
-| `--ui-overlay`, `--ui-shadow` | A modal's backdrop, and popup shadows |
-| `--ui-radius` | Corners. Above 0, switch and slider thumbs turn fully round |
-| `--ui-spacing` | The unit every height, padding and gap is a multiple of |
-| `--ui-font-size`, `--ui-line-height` | Control text |
-| `--ui-font-sans`, `--ui-font-mono` | Fonts |
-| `--ui-icon-chevron`, `-check`, `-minus`, `-plus`, `-x`, `-eye`, `-eye-off`, `-calendar`, `-pipette`, `-star` | The default icons below, as `url()` images used as masks |
+| Token                                                                                                        | What it drives                                                                          |
+| ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| `--ui-background`, `--ui-foreground`                                                                         | Page, field and popup surfaces, and their text                                          |
+| `--ui-muted`, `--ui-muted-foreground`                                                                        | Hover and selected fills; hints, placeholders and secondary text                        |
+| `--ui-border`                                                                                                | Dividers and popup edges                                                                |
+| `--ui-input`                                                                                                 | Borders of inputs, selects, checkboxes, buttons and the empty part of a track or rating |
+| `--ui-primary`, `--ui-primary-foreground`                                                                    | Checked, pressed and filled states, and the text on them                                |
+| `--ui-destructive`                                                                                           | Errors and invalid borders                                                              |
+| `--ui-ring`, `--ui-ring-border`                                                                              | The focus outline, and a field's border while it has focus                              |
+| `--ui-overlay`, `--ui-shadow`                                                                                | A modal's backdrop, and popup shadows                                                   |
+| `--ui-radius`                                                                                                | Corners. Above 0, switch and slider thumbs turn fully round                             |
+| `--ui-spacing`                                                                                               | The unit every height, padding and gap is a multiple of                                 |
+| `--ui-font-size`, `--ui-line-height`                                                                         | Control text                                                                            |
+| `--ui-font-sans`, `--ui-font-mono`                                                                           | Fonts                                                                                   |
+| `--ui-icon-chevron`, `-check`, `-minus`, `-plus`, `-x`, `-eye`, `-eye-off`, `-calendar`, `-pipette`, `-star` | The default icons below, as `url()` images used as masks                                |
 
 ### Icons it draws
 

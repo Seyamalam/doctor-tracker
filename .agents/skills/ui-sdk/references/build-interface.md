@@ -4,57 +4,57 @@
 
 Read `node_modules/@ui-sdk/<framework>/docs/llms.txt` for the list, or https://ui-sdk.dev/web.md on a page with no build step, then pick from this table. Read each picked component's page, `docs/components/<name>.md` (the page `web.md` links), before writing it: its Composition shows the parts and how they nest, and its API lists props, state attributes and change reasons.
 
-| The person needs to | Use |
-| --- | --- |
-| Run an action | Button |
-| Turn a setting on or off | Switch |
-| Keep a button pressed, or a group of pressed buttons | Toggle |
-| Choose one or more independent options | Checkbox |
-| Choose one of a few options, all visible | Radio, or Segmented Control for a compact row |
-| Choose one or several from a popup list | Select |
-| Choose from an always-visible list | Listbox |
-| Search a list and choose one or several | Combobox |
-| Type free text with suggestions | Autocomplete |
-| Search and run commands | Command |
-| Mention or tag with @, / or # while typing | Trigger Menu |
-| Mix text with tokens for people, files or tags | Token Input |
-| Enter text | Input, or Textarea for several lines |
-| Enter a number | Number Input (for money, `step={0.01}`: a step of 1 rounds the cents) |
-| Enter a password | Password Input |
-| Enter a one-time code | OTP Input |
-| Enter a date | Date Input, or Date Picker with a calendar |
-| Pick dates from a month grid | Calendar |
-| Enter a time | Time Input |
-| Pick a number or range by dragging | Slider |
-| Pick a score | Rating |
-| Pick a color | Color Picker |
-| Choose, drop or paste files | File Input |
-| Crop an image | Image Cropper |
-| Label a control, with a description and errors | Field, with Label |
-| Confirm before an action | Alert Dialog (`AlertDialogClose value="confirm"` is the agreeing answer) |
-| Do a focused task over the page | Dialog, or Drawer from an edge |
-| Edit or explore something beside its trigger | Popover |
-| Choose actions from a button or a right click | Menu |
-| An application menu bar | Menubar |
-| Group buttons and toggles with one tab stop | Toolbar |
-| Name a control or add a short hint | Tooltip |
-| Preview a link | Hover Card |
-| Site navigation with panels | Navigation Menu |
-| Switch between panels | Tabs |
-| Show and hide sections | Accordion, or Collapsible for one |
-| Browse a hierarchy | Tree |
-| Pick from a grid, like seats | Your own component on `createGridFocus` |
-| Drag to reorder a list, or cards between columns | Your own component on `createReorder` or `createTransfer` |
-| Show a trace or request timings on a time axis | Waterfall |
-| Page through results | Pagination |
-| Page through slides | Carousel |
-| Resizable panels | Resizable |
-| Styled scrolling | Scroll Area |
-| Notifications | Toast |
-| Progress of a task | Progress |
-| A measurement in a range | Meter |
-| A user's image with a fallback | Avatar |
-| Divide content | Separator |
+| The person needs to                                  | Use                                                                      |
+| ---------------------------------------------------- | ------------------------------------------------------------------------ |
+| Run an action                                        | Button                                                                   |
+| Turn a setting on or off                             | Switch                                                                   |
+| Keep a button pressed, or a group of pressed buttons | Toggle                                                                   |
+| Choose one or more independent options               | Checkbox                                                                 |
+| Choose one of a few options, all visible             | Radio, or Segmented Control for a compact row                            |
+| Choose one or several from a popup list              | Select                                                                   |
+| Choose from an always-visible list                   | Listbox                                                                  |
+| Search a list and choose one or several              | Combobox                                                                 |
+| Type free text with suggestions                      | Autocomplete                                                             |
+| Search and run commands                              | Command                                                                  |
+| Mention or tag with @, / or # while typing           | Trigger Menu                                                             |
+| Mix text with tokens for people, files or tags       | Token Input                                                              |
+| Enter text                                           | Input, or Textarea for several lines                                     |
+| Enter a number                                       | Number Input (for money, `step={0.01}`: a step of 1 rounds the cents)    |
+| Enter a password                                     | Password Input                                                           |
+| Enter a one-time code                                | OTP Input                                                                |
+| Enter a date                                         | Date Input, or Date Picker with a calendar                               |
+| Pick dates from a month grid                         | Calendar                                                                 |
+| Enter a time                                         | Time Input                                                               |
+| Pick a number or range by dragging                   | Slider                                                                   |
+| Pick a score                                         | Rating                                                                   |
+| Pick a color                                         | Color Picker                                                             |
+| Choose, drop or paste files                          | File Input                                                               |
+| Crop an image                                        | Image Cropper                                                            |
+| Label a control, with a description and errors       | Field, with Label                                                        |
+| Confirm before an action                             | Alert Dialog (`AlertDialogClose value="confirm"` is the agreeing answer) |
+| Do a focused task over the page                      | Dialog, or Drawer from an edge                                           |
+| Edit or explore something beside its trigger         | Popover                                                                  |
+| Choose actions from a button or a right click        | Menu                                                                     |
+| An application menu bar                              | Menubar                                                                  |
+| Group buttons and toggles with one tab stop          | Toolbar                                                                  |
+| Name a control or add a short hint                   | Tooltip                                                                  |
+| Preview a link                                       | Hover Card                                                               |
+| Site navigation with panels                          | Navigation Menu                                                          |
+| Switch between panels                                | Tabs                                                                     |
+| Show and hide sections                               | Accordion, or Collapsible for one                                        |
+| Browse a hierarchy                                   | Tree                                                                     |
+| Pick from a grid, like seats                         | Your own component on `createGridFocus`                                  |
+| Drag to reorder a list, or cards between columns     | Your own component on `createReorder` or `createTransfer`                |
+| Show a trace or request timings on a time axis       | Waterfall                                                                |
+| Page through results                                 | Pagination                                                               |
+| Page through slides                                  | Carousel                                                                 |
+| Resizable panels                                     | Resizable                                                                |
+| Styled scrolling                                     | Scroll Area                                                              |
+| Notifications                                        | Toast                                                                    |
+| Progress of a task                                   | Progress                                                                 |
+| A measurement in a range                             | Meter                                                                    |
+| A user's image with a fallback                       | Avatar                                                                   |
+| Divide content                                       | Separator                                                                |
 
 If nothing fits, build that one piece with [create-component.md](create-component.md), from the behaviors in the Core docs. Don't hand-roll it in markup.
 
@@ -70,13 +70,13 @@ If nothing fits, build that one piece with [create-component.md](create-componen
 
 Use the default prop to start (`defaultValue`, `defaultOpen`, `defaultChecked`, `defaultPressed`). Control it only when the app needs the value:
 
-| Framework | Controlled value | Change callback |
-| --- | --- | --- |
-| React | `value={value} onValueChange={setValue}` | `onValueChange(value, details)` |
-| Vue | `v-model="value"`, or `v-model:open` for another key | `@value-change="(value, details) => …"` |
-| Svelte | `bind:value` on `$state` | `onValueChange(value, details)` |
-| Solid | `value={value()} onValueChange={setValue}` | `onValueChange(value, details)` |
-| Web components | `element.value = …` | `valuechange` event, `event.detail` |
+| Framework      | Controlled value                                     | Change callback                         |
+| -------------- | ---------------------------------------------------- | --------------------------------------- |
+| React          | `value={value} onValueChange={setValue}`             | `onValueChange(value, details)`         |
+| Vue            | `v-model="value"`, or `v-model:open` for another key | `@value-change="(value, details) => …"` |
+| Svelte         | `bind:value` on `$state`                             | `onValueChange(value, details)`         |
+| Solid          | `value={value()} onValueChange={setValue}`           | `onValueChange(value, details)`         |
+| Web components | `element.value = …`                                  | `valuechange` event, `event.detail`     |
 
 `details.reason` says what asked for the change (`outside-press`, `escape-key`, `item-press`…), `details.source` says how (`keyboard`, `mouse`, `agent`…), and `details.cancel()` refuses it. In web components, call `event.preventDefault()` instead. Select, Tabs and Radio report `null` when nothing is selected; multiple Select and Combobox use arrays.
 
@@ -112,7 +112,7 @@ Use the default prop to start (`defaultValue`, `defaultOpen`, `defaultChecked`, 
 A settings form in React:
 
 ```tsx
-"use client";
+"use client"
 
 import {
   AlertDialog,
@@ -120,17 +120,17 @@ import {
   AlertDialogContent,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@ui-sdk/react/alert-dialog";
-import { Field, FieldLabel } from "@ui-sdk/react/field";
-import { Input } from "@ui-sdk/react/input";
+} from "@ui-sdk/react/alert-dialog"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@ui-sdk/react/select";
-import { Switch, SwitchThumb } from "@ui-sdk/react/switch";
+} from "@ui-sdk/react/select"
+import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 
 function ProjectSettings() {
   return (
@@ -174,10 +174,10 @@ function ProjectSettings() {
         </AlertDialogContent>
       </AlertDialog>
     </>
-  );
+  )
 }
 
-export { ProjectSettings };
+export { ProjectSettings }
 ```
 
 Check each part name against the component pages; they're the source of truth.
