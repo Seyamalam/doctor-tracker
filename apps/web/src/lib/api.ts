@@ -1,6 +1,7 @@
 import { ENV } from "@/env";
 
-const BASE_URL = ENV.NEXT_PUBLIC_SERVER_URL.replace(/\/$/u, "");
+const boundServerUrl = typeof window === "undefined" ? process.env.SERVER_URL : undefined;
+const BASE_URL = (boundServerUrl ?? ENV.NEXT_PUBLIC_SERVER_URL ?? "").replace(/\/$/u, "");
 
 export class ApiError extends Error {
   status: number;
