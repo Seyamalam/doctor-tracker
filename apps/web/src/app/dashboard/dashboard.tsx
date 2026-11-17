@@ -27,6 +27,8 @@ const TEAL = "#14b8a6";
 const SLATE = "#64748b";
 const PIE_COLORS = ["#0d9488", "#0891b2", "#10b981", "#0ea5e9", "#64748b", "#94a3b8"];
 
+const truncateTick = (value: string) => (value.length > 18 ? `${value.slice(0, 17)}…` : value);
+
 const StatCard = ({
   label,
   value,
@@ -243,7 +245,9 @@ const Dashboard = ({ name }: { name: string }) => {
                 <span
                   aria-hidden="true"
                   className="h-2.5 w-2.5 shrink-0 rounded-sm"
-                  style={{ backgroundColor: PIE_COLORS[index % PIE_COLORS.length] }}
+                  style={{
+                    backgroundColor: PIE_COLORS[index % PIE_COLORS.length],
+                  }}
                 />
                 <span className="text-muted-foreground min-w-0 truncate" title={entry.condition}>
                   {entry.condition}
@@ -264,7 +268,13 @@ const Dashboard = ({ name }: { name: string }) => {
             <ResponsiveContainer height="100%" width="100%">
               <BarChart data={topDoctors} layout="vertical" margin={{ left: 8, right: 16, top: 4 }}>
                 <XAxis allowDecimals={false} tickLine={false} type="number" />
-                <YAxis dataKey="name" tickLine={false} type="category" width={96} />
+                <YAxis
+                  dataKey="name"
+                  tickFormatter={truncateTick}
+                  tickLine={false}
+                  type="category"
+                  width={128}
+                />
                 <Tooltip content={<ChartTooltip />} cursor={false} />
                 <Legend iconSize={10} />
                 <Bar dataKey="count" fill={TEAL} name="Patients" radius={[0, 4, 4, 0]} />

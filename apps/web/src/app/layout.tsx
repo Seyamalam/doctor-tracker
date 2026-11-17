@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "../index.css";
-import Header from "@/components/header";
+import AppShell from "@/components/app-shell";
 import Providers from "@/components/providers";
 import { ENV } from "@/env";
 
@@ -71,10 +71,7 @@ const RootLayout = ({
   <html lang="en" suppressHydrationWarning>
     <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
       <Providers>
-        <div className="grid min-h-dvh grid-cols-1 grid-rows-[auto_1fr]">
-          <Header />
-          {children}
-        </div>
+        <AppShell>{children}</AppShell>
       </Providers>
     </body>
   </html>
