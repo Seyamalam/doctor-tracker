@@ -18,6 +18,12 @@ export const btn = {
 export const inputCls =
   "h-9 w-full rounded-lg border border-input bg-card px-3 text-foreground text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring disabled:opacity-50 coarse:h-10";
 
+export const kbdCls =
+  "border-border bg-muted text-muted-foreground pointer-events-none inline-flex h-5 shrink-0 select-none items-center justify-center rounded border px-1.5 font-mono text-[10px] font-medium";
+
+export const searchFieldCls =
+  "border-border bg-card text-muted-foreground flex h-9 min-w-0 touch-manipulation select-none items-center gap-2 rounded-lg border px-3 text-left text-sm transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transition-none coarse:h-10";
+
 export const labelCls = "font-medium text-[13px] text-foreground";
 
 export const popupCls =

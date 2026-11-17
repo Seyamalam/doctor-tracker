@@ -110,6 +110,11 @@
   }
 }
 
+/* web.css underlines every <a>; this app styles links as controls instead */
+a {
+  text-decoration: none;
+}
+
 @keyframes dt-enter {
   from {
     opacity: 0;

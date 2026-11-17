@@ -13,6 +13,7 @@ import {
   Menu as MenuIcon,
   PanelLeftClose,
   PanelLeftOpen,
+  Search,
   Stethoscope,
   Users,
 } from "lucide-react";
@@ -25,7 +26,15 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { backdropCls } from "@/components/dialogs";
 import { Logo } from "@/components/logo";
 import { ModeToggle } from "@/components/mode-toggle";
-import { btn, cx, popupAnimCls, popupCls } from "@/components/ui";
+import SearchPalette from "@/components/search-palette";
+import {
+  btn,
+  cx,
+  kbdCls,
+  popupAnimCls,
+  popupCls,
+  searchFieldCls,
+} from "@/components/ui";
 import UserMenu, { CollapsedUserMenu } from "@/components/user-menu";
 
 const COLLAPSED_KEY = "dt.sidebar.collapsed";
@@ -166,9 +175,81 @@ const NavList = ({
 const drawerCls =
   "fixed left-0 top-0 z-50 m-0 flex h-dvh w-72 max-w-[85vw] flex-col gap-4 overscroll-contain rounded-none border-r border-border bg-card p-4 text-foreground shadow-xl transition-[opacity,translate] duration-200 ease-out data-ending-style:-translate-x-4 data-starting-style:-translate-x-4 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-opacity";
 
+const CollapseButton = ({
+  collapsed,
+  onToggle,
+}: {
+  collapsed: boolean;
+  onToggle: () => void;
+}) => (
+  <Tooltip>
+    <TooltipTrigger
+      aria-keyshortcuts="b"
+      aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+      className={btn.icon}
+      onClick={onToggle}
+      type="button"
+    >
+      {collapsed ? (
+        <PanelLeftOpen aria-hidden="true" className="h-4 w-4" />
+      ) : (
+        <PanelLeftClose aria-hidden="true" className="h-4 w-4" />
+      )}
+    </TooltipTrigger>
+    <TooltipContent
+      className={cx(popupCls, popupAnimCls, "px-2.5 py-1.5 text-xs")}
+      side={collapsed ? "right" : "bottom"}
+    >
+      {collapsed ? "Expand sidebar" : "Collapse sidebar"} (B)
+    </TooltipContent>
+  </Tooltip>
+);
+
+const SidebarSearchButton = ({
+  collapsed,
+  onOpen,
+}: {
+  collapsed: boolean;
+  onOpen: () => void;
+}) => {
+  if (!collapsed) {
+    return (
+      <button
+        aria-keyshortcuts="meta+k"
+        className={cx(searchFieldCls, "w-full")}
+        onClick={onOpen}
+        type="button"
+      >
+        <Search aria-hidden="true" className="h-4 w-4 shrink-0" />
+        <span className="min-w-0 flex-1 truncate">Search…</span>
+        <kbd className={kbdCls}>⌘K</kbd>
+      </button>
+    );
+  }
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        aria-label="Search"
+        className={cx(btn.icon, "h-10 w-10")}
+        onClick={onOpen}
+        type="button"
+      >
+        <Search aria-hidden="true" className="h-4 w-4" />
+      </TooltipTrigger>
+      <TooltipContent
+        className={cx(popupCls, popupAnimCls, "px-2.5 py-1.5 text-xs")}
+        side="right"
+      >
+        Search (⌘K)
+      </TooltipContent>
+    </Tooltip>
+  );
+};
+
 const AppShell = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const collapsed = useSyncExternalStore(
     subscribeCollapsed,
     readCollapsed,
@@ -221,82 +302,83 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           collapsed ? "w-16" : "w-64"
         )}
       >
-        <div className={cx("pb-4 pt-5", collapsed ? "px-3" : "px-4")}>
+        <div
+          className={cx(
+            "flex pb-3 pt-5",
+            collapsed
+              ? "flex-col items-center gap-3 px-2"
+              : "items-center justify-between pl-4 pr-3"
+          )}
+        >
           <Brand collapsed={collapsed} />
+          <CollapseButton collapsed={collapsed} onToggle={toggleCollapsed} />
+        </div>
+        <div className={cx("pb-3", collapsed ? "px-2" : "px-3")}>
+          <SidebarSearchButton
+            collapsed={collapsed}
+            onOpen={() => setPaletteOpen(true)}
+          />
         </div>
         <div className={cx("flex-1", collapsed ? "px-2" : "px-3")}>
           <NavList collapsed={collapsed} pathname={pathname} />
         </div>
         <div
           className={cx(
-            "border-border flex items-center gap-1 border-t p-3",
-            collapsed ? "flex-col" : "justify-between"
+            "border-border flex items-center border-t",
+            collapsed ? "flex-col gap-2 py-3" : "gap-2 p-3"
           )}
         >
-          {collapsed ? <CollapsedUserMenu /> : <UserMenu />}
-          <div className="flex items-center gap-1">
-            <ModeToggle />
-            <Tooltip>
-              <TooltipTrigger
-                aria-keyshortcuts="b"
-                aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-                className={btn.icon}
-                onClick={toggleCollapsed}
-                type="button"
-              >
-                {collapsed ? (
-                  <PanelLeftOpen aria-hidden="true" className="h-4 w-4" />
-                ) : (
-                  <PanelLeftClose aria-hidden="true" className="h-4 w-4" />
-                )}
-              </TooltipTrigger>
-              <TooltipContent
-                className={cx(popupCls, popupAnimCls, "px-2.5 py-1.5 text-xs")}
-                side={collapsed ? "right" : "top"}
-              >
-                {collapsed ? "Expand sidebar" : "Collapse sidebar"} (B)
-              </TooltipContent>
-            </Tooltip>
+          <div className={collapsed ? undefined : "min-w-0 flex-1"}>
+            {collapsed ? <CollapsedUserMenu /> : <UserMenu />}
           </div>
+          <ModeToggle />
         </div>
       </aside>
 
-      <div className="border-border bg-card sticky top-0 z-30 flex h-14 items-center gap-2 border-b px-3 pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] lg:hidden">
-        <Dialog onOpenChange={setDrawerOpen} open={drawerOpen}>
-          <DialogTrigger
-            aria-expanded={drawerOpen}
-            aria-label="Open navigation"
-            className={btn.icon}
-          >
-            <MenuIcon aria-hidden="true" className="h-4 w-4" />
-          </DialogTrigger>
-          <DialogBackdrop className={backdropCls} />
-          <DialogContent className={drawerCls}>
-            <div className="px-1 pt-1">
-              <Brand />
-            </div>
-            <DialogTitle className="sr-only">Navigation</DialogTitle>
-            <div className="flex-1">
-              <NavList onNavigate={closeDrawer} pathname={pathname} />
-            </div>
-            <div className="border-border flex items-center justify-between gap-2 border-t pt-3">
-              <UserMenu />
-              <ModeToggle />
-            </div>
-          </DialogContent>
-        </Dialog>
-        <Brand />
-      </div>
-
       <div
         className={cx(
-          "transition-[padding] duration-200 ease-out motion-reduce:transition-none",
+          "flex min-h-dvh flex-col transition-[padding] duration-200 ease-out motion-reduce:transition-none",
           collapsed ? "lg:pl-16" : "lg:pl-64"
         )}
-        id="main-content"
-        tabIndex={-1}
       >
-        {children}
+        <header className="border-border bg-background/80 sticky top-0 z-30 flex h-14 items-center gap-2 border-b px-3 pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] backdrop-blur sm:px-4">
+          <Dialog onOpenChange={setDrawerOpen} open={drawerOpen}>
+            <DialogTrigger
+              aria-expanded={drawerOpen}
+              aria-label="Open navigation"
+              className={cx(btn.icon, "lg:hidden")}
+            >
+              <MenuIcon aria-hidden="true" className="h-4 w-4" />
+            </DialogTrigger>
+            <DialogBackdrop className={backdropCls} />
+            <DialogContent className={drawerCls}>
+              <div className="px-1 pt-1">
+                <Brand />
+              </div>
+              <DialogTitle className="sr-only">Navigation</DialogTitle>
+              <div className="flex-1">
+                <NavList onNavigate={closeDrawer} pathname={pathname} />
+              </div>
+              <div className="border-border flex items-center justify-between gap-2 border-t pt-3">
+                <UserMenu />
+                <ModeToggle />
+              </div>
+            </DialogContent>
+          </Dialog>
+          <div className="lg:hidden">
+            <Brand collapsed />
+          </div>
+          <div className="min-w-0 flex-1 sm:px-4">
+            <SearchPalette
+              onOpenChange={setPaletteOpen}
+              onToggleSidebar={toggleCollapsed}
+              open={paletteOpen}
+            />
+          </div>
+        </header>
+        <main className="flex-1" id="main-content" tabIndex={-1}>
+          {children}
+        </main>
       </div>
     </>
   );
