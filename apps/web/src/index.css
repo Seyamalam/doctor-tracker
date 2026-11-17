@@ -94,6 +94,20 @@
       font-size: 1rem;
     }
   }
+
+  /* Rubber-band suppression on precision pointers only — coarse keeps pull-to-refresh */
+  @media (pointer: fine) {
+    html {
+      overscroll-behavior: none;
+    }
+  }
+
+  /* Focus/anchor scrolls stay clear of the mobile topbar */
+  @media (width < 64rem) {
+    html {
+      scroll-padding-top: 3.5rem;
+    }
+  }
 }
 
 @keyframes dt-enter {

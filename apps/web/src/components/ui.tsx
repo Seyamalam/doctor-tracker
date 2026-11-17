@@ -4,7 +4,7 @@ export const cx = (...parts: (string | false | null | undefined)[]): string =>
   parts.filter(Boolean).join(" ");
 
 const btnBase =
-  "inline-flex select-none items-center justify-center gap-2 rounded-lg font-medium transition-[background-color,color,transform,opacity] duration-100 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none motion-reduce:active:scale-100";
+  "inline-flex touch-manipulation select-none items-center justify-center gap-2 rounded-lg font-medium transition-[background-color,color,transform,opacity] duration-100 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none motion-reduce:active:scale-100";
 
 export const btn = {
   danger: `${btnBase} h-9 bg-danger px-4 text-danger-foreground text-sm hover:bg-danger/90 coarse:h-10`,
@@ -43,9 +43,11 @@ export const PageHeader = ({
 }) => (
   <div className="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
+      <h1 className="text-xl font-semibold tracking-tight text-balance">
+        {title}
+      </h1>
       {description ? (
-        <p className="text-muted-foreground mt-0.5 text-[13px]">
+        <p className="text-muted-foreground mt-0.5 text-[13px] text-pretty">
           {description}
         </p>
       ) : null}

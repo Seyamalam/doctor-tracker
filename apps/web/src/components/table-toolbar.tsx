@@ -46,10 +46,12 @@ export const SearchInput = ({ placeholder }: { placeholder: string }) => {
           className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
         />
         <Input
+          autoComplete="off"
           className={cx(inputCls, "pl-9")}
           enterKeyHint="search"
           id="table-search"
           name="search"
+          spellCheck={false}
           onValueChange={(next) => {
             setValue(next);
             apply(next);
@@ -265,7 +267,7 @@ export const TableFooter = ({
   const end = outOfRange ? 0 : Math.min(page * limit, total);
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <p className="text-muted-foreground text-[13px]">
+      <p className="text-muted-foreground text-[13px] tabular-nums">
         Showing <span className="text-foreground font-medium">{start}</span>–
         <span className="text-foreground font-medium">{end}</span> of{" "}
         <span className="text-foreground font-medium">{total}</span>

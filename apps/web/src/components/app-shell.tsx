@@ -26,7 +26,7 @@ import { backdropCls } from "@/components/dialogs";
 import { Logo } from "@/components/logo";
 import { ModeToggle } from "@/components/mode-toggle";
 import { btn, cx, popupAnimCls, popupCls } from "@/components/ui";
-import UserMenu from "@/components/user-menu";
+import UserMenu, { CollapsedUserMenu } from "@/components/user-menu";
 
 const COLLAPSED_KEY = "dt.sidebar.collapsed";
 const COLLAPSED_EVENT = "dt:sidebar-toggle";
@@ -67,7 +67,7 @@ const Brand = ({ collapsed }: { collapsed?: boolean }) => (
     <Logo className="h-7 w-7 shrink-0" />
     {collapsed ? null : (
       <span className="flex min-w-0 flex-col">
-        <span className="text-sm font-semibold tracking-tight">
+        <span className="text-sm font-semibold tracking-tight" translate="no">
           Doctor Tracker
         </span>
         <span className="text-muted-foreground text-[11px]">Admin console</span>
@@ -164,7 +164,7 @@ const NavList = ({
 );
 
 const drawerCls =
-  "fixed left-0 top-0 z-50 m-0 flex h-dvh w-72 max-w-[85vw] flex-col gap-4 rounded-none border-r border-border bg-card p-4 text-foreground shadow-xl transition-[opacity,translate] duration-200 ease-out data-ending-style:-translate-x-4 data-starting-style:-translate-x-4 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-opacity";
+  "fixed left-0 top-0 z-50 m-0 flex h-dvh w-72 max-w-[85vw] flex-col gap-4 overscroll-contain rounded-none border-r border-border bg-card p-4 text-foreground shadow-xl transition-[opacity,translate] duration-200 ease-out data-ending-style:-translate-x-4 data-starting-style:-translate-x-4 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-opacity";
 
 const AppShell = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
@@ -209,6 +209,12 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
+      <a
+        className="bg-primary text-primary-foreground sr-only z-[60] rounded-md px-3 py-2 text-sm font-medium focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+        href="#main-content"
+      >
+        Skip to content
+      </a>
       <aside
         className={cx(
           "bg-card border-border fixed inset-y-0 left-0 z-30 hidden flex-col border-r transition-[width] duration-200 ease-out motion-reduce:transition-none lg:flex",
@@ -227,7 +233,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
             collapsed ? "flex-col" : "justify-between"
           )}
         >
-          <UserMenu compact={collapsed} />
+          {collapsed ? <CollapsedUserMenu /> : <UserMenu />}
           <div className="flex items-center gap-1">
             <ModeToggle />
             <Tooltip>
@@ -287,6 +293,8 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           "transition-[padding] duration-200 ease-out motion-reduce:transition-none",
           collapsed ? "lg:pl-16" : "lg:pl-64"
         )}
+        id="main-content"
+        tabIndex={-1}
       >
         {children}
       </div>

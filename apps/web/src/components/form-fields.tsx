@@ -44,12 +44,14 @@ export const TextField = ({
   type = "text",
   placeholder,
   autoComplete,
+  spellCheck,
 }: {
   field: FieldLike;
   label: string;
   type?: string;
   placeholder?: string;
   autoComplete?: string;
+  spellCheck?: boolean;
 }) => (
   <Field name={field.name}>
     <FieldLabel className={labelCls}>{label}</FieldLabel>
@@ -60,6 +62,7 @@ export const TextField = ({
       onBlur={field.handleBlur}
       onValueChange={(value) => field.handleChange(value)}
       placeholder={placeholder}
+      spellCheck={spellCheck}
       type={type}
       value={field.state.value}
     />

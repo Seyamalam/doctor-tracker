@@ -103,6 +103,7 @@ const DoctorForm = ({
               autoComplete="email"
               field={field}
               label="Email"
+              spellCheck={false}
               type="email"
             />
           )}

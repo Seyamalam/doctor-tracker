@@ -74,6 +74,7 @@ const SignInForm = ({ onSwitchToSignUp }: { onSwitchToSignUp: () => void }) => {
             autoComplete="email"
             field={field}
             label="Email"
+            spellCheck={false}
             type="email"
           />
         )}
