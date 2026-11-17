@@ -1,126 +1,150 @@
 "use client";
 
-import { Button } from "@doctor-tracker/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@doctor-tracker/ui/components/card";
-import { Checkbox } from "@doctor-tracker/ui/components/checkbox";
-import { Input } from "@doctor-tracker/ui/components/input";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { Loader2, Trash2 } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@ui-sdk/react/button";
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox";
+import { Input } from "@ui-sdk/react/input";
+import { CheckIcon, Loader2, Trash2 } from "lucide-react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 
-import { useTRPC } from "@/utils/trpc";
+import { api } from "@/lib/api";
+import type { Todo } from "@/lib/api";
 
-type TodoId = string;
+type TodoId = Todo["id"];
 
-export default function TodosPage() {
+const TODOS_KEY = ["todos"] as const;
+
+const TodosPage = () => {
   const [newTodoText, setNewTodoText] = useState("");
 
-  const trpc = useTRPC();
-  const todos = useQuery(trpc.todo.getAll.queryOptions());
-  const createMutation = useMutation(
-    trpc.todo.create.mutationOptions({
-      onSuccess: () => {
-        todos.refetch();
-        setNewTodoText("");
-      },
-    }),
-  );
-  const toggleMutation = useMutation(
-    trpc.todo.toggle.mutationOptions({
-      onSuccess: () => {
-        todos.refetch();
-      },
-    }),
-  );
-  const deleteMutation = useMutation(
-    trpc.todo.delete.mutationOptions({
-      onSuccess: () => {
-        todos.refetch();
-      },
-    }),
-  );
+  const queryClient = useQueryClient();
+  const invalidateTodos = () =>
+    queryClient.invalidateQueries({ queryKey: TODOS_KEY });
+
+  const todos = useQuery({ queryFn: api.todos.list, queryKey: TODOS_KEY });
+  const createMutation = useMutation({
+    mutationFn: (text: string) => api.todos.create(text),
+    onSuccess: () => {
+      invalidateTodos();
+      setNewTodoText("");
+    },
+  });
+  const toggleMutation = useMutation({
+    mutationFn: ({ id, completed }: { id: TodoId; completed: boolean }) =>
+      api.todos.update(id, { completed }),
+    onSuccess: invalidateTodos,
+  });
+  const deleteMutation = useMutation({
+    mutationFn: (id: TodoId) => api.todos.remove(id),
+    onSuccess: invalidateTodos,
+  });
 
   const handleAddTodo = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newTodoText.trim()) {
-      createMutation.mutate({ text: newTodoText });
+      createMutation.mutate(newTodoText);
     }
   };
 
   const handleToggleTodo = (id: TodoId, completed: boolean) => {
-    toggleMutation.mutate({ id, completed: !completed });
+    toggleMutation.mutate({ completed: !completed, id });
   };
 
   const handleDeleteTodo = (id: TodoId) => {
-    deleteMutation.mutate({ id });
+    deleteMutation.mutate(id);
   };
 
   return (
     <div className="mx-auto w-full max-w-md py-10">
-      <Card>
-        <CardHeader>
-          <CardTitle>Todo List</CardTitle>
-          <CardDescription>Manage your tasks efficiently</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleAddTodo} className="mb-6 flex items-center space-x-2">
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
+        <div className="border-b border-gray-200 p-6 dark:border-gray-800">
+          <h2 className="text-lg font-semibold">Todo List</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Manage your tasks efficiently
+          </p>
+        </div>
+        <div className="p-6">
+          <form
+            className="mb-6 flex items-center space-x-2"
+            onSubmit={handleAddTodo}
+          >
             <Input
-              value={newTodoText}
-              onChange={(e) => setNewTodoText(e.target.value)}
-              placeholder="Add a new task..."
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-900"
               disabled={createMutation.isPending}
+              onValueChange={(value) => setNewTodoText(value)}
+              placeholder="Add a new task..."
+              value={newTodoText}
             />
-            <Button type="submit" disabled={createMutation.isPending || !newTodoText.trim()}>
-              {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
+            <Button
+              className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900"
+              disabled={createMutation.isPending || !newTodoText.trim()}
+              type="submit"
+            >
+              {createMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Add"
+              )}
             </Button>
           </form>
 
-          {todos.isLoading ? (
-            <div className="flex justify-center py-4">
-              <Loader2 className="h-6 w-6 animate-spin" />
-            </div>
-          ) : todos.data?.length === 0 ? (
-            <p className="py-4 text-center">No todos yet. Add one above!</p>
-          ) : (
-            <ul className="space-y-2">
-              {todos.data?.map((todo) => (
-                <li
-                  key={todo.id}
-                  className="flex items-center justify-between rounded-md border p-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      checked={todo.completed}
-                      onCheckedChange={() => handleToggleTodo(todo.id, todo.completed)}
-                      id={`todo-${todo.id}`}
-                    />
-                    <label
-                      htmlFor={`todo-${todo.id}`}
-                      className={`${todo.completed ? "line-through text-muted-foreground" : ""}`}
-                    >
-                      {todo.text}
-                    </label>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteTodo(todo.id)}
-                    aria-label="Delete todo"
+          {(() => {
+            if (todos.isLoading) {
+              return (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              );
+            }
+            if (todos.data?.length === 0) {
+              return (
+                <p className="py-4 text-center">No todos yet. Add one above!</p>
+              );
+            }
+            return (
+              <ul className="space-y-2">
+                {todos.data?.map((todo) => (
+                  <li
+                    className="flex items-center justify-between rounded-md border border-gray-200 p-2 dark:border-gray-800"
+                    key={todo.id}
                   >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={todo.completed}
+                        className="flex h-4 w-4 items-center justify-center rounded border border-gray-400 data-checked:bg-gray-900 data-checked:text-white dark:border-gray-600"
+                        id={`todo-${todo.id}`}
+                        onCheckedChange={() =>
+                          handleToggleTodo(todo.id, todo.completed)
+                        }
+                      >
+                        <CheckboxIndicator>
+                          <CheckIcon aria-hidden="true" className="h-3 w-3" />
+                        </CheckboxIndicator>
+                      </Checkbox>
+                      <label
+                        className={`${todo.completed ? "text-gray-400 line-through" : ""}`}
+                        htmlFor={`todo-${todo.id}`}
+                      >
+                        {todo.text}
+                      </label>
+                    </div>
+                    <Button
+                      aria-label="Delete todo"
+                      className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800"
+                      onClick={() => handleDeleteTodo(todo.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            );
+          })()}
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default TodosPage;

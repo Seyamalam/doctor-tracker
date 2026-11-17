@@ -1,27 +1,30 @@
 "use client";
 
-import { Toaster } from "@doctor-tracker/ui/components/sonner";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { useState } from "react";
+import { Toaster } from "sonner";
 
-import { getQueryClient, makeTRPCClient, TRPCProvider } from "@/utils/trpc";
+import { getQueryClient } from "@/lib/query-client";
 
 import { ThemeProvider } from "./theme-provider";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+const Providers = ({ children }: { children: React.ReactNode }) => {
   const queryClient = getQueryClient();
-  const [trpcClient] = useState(makeTRPCClient);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
       <QueryClientProvider client={queryClient}>
-        <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
-          {children}
-        </TRPCProvider>
+        {children}
         <ReactQueryDevtools />
       </QueryClientProvider>
       <Toaster richColors />
     </ThemeProvider>
   );
-}
+};
+
+export default Providers;

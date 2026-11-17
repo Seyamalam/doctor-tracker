@@ -2,32 +2,31 @@ import type { Database } from "@doctor-tracker/db";
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 
-export type AuthConfig = {
+export interface AuthConfig {
   BETTER_AUTH_URL: string;
   BETTER_AUTH_SECRET: string;
   CORS_ORIGIN: string;
-};
+}
 
-export function createAuth(
+export const createAuth = (
   env: AuthConfig,
   database: Database,
-  desktopOrigins: readonly string[] = [],
-) {
-  return betterAuth({
-    database: mongodbAdapter(database),
-    trustedOrigins: [env.CORS_ORIGIN, ...desktopOrigins],
-    emailAndPassword: { enabled: true },
-    secret: env.BETTER_AUTH_SECRET,
-    baseURL: env.BETTER_AUTH_URL,
+  desktopOrigins: readonly string[] = []
+) =>
+  betterAuth({
     advanced: {
       defaultCookieAttributes: {
+        httpOnly: true,
         sameSite: "none",
         secure: true,
-        httpOnly: true,
       },
     },
+    baseURL: env.BETTER_AUTH_URL,
+    database: mongodbAdapter(database),
+    emailAndPassword: { enabled: true },
     plugins: [],
+    secret: env.BETTER_AUTH_SECRET,
+    trustedOrigins: [env.CORS_ORIGIN, ...desktopOrigins],
   });
-}
 
 export type Session = ReturnType<typeof createAuth>["$Infer"]["Session"];

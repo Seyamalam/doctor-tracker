@@ -1,3 +1,46 @@
+# Doctor Tracker — Project Guide
+
+Secure admin web app for managing doctors and their patients. Spec requires: auth-gated access, doctor/patient CRUD with search/filter/pagination, dashboard analytics, RESTful API, Next.js + Node.js/Express + MongoDB.
+
+## Monorepo layout (npm workspaces)
+
+- `apps/web` — Next.js 16 frontend, `localhost:3001`
+- `apps/server` — Express 5 REST API, `localhost:3000` (Node.js runtime via `tsx`)
+- `packages/api` — Express routers shared as a workspace package (`createApiRouter(auth)`)
+- `packages/auth` — better-auth config (email/password, MongoDB adapter)
+- `packages/db` — Mongoose models + `createDb(env)`
+
+## Commands
+
+- `npm run dev` — run all apps (web + server) via vite-plus
+- `npm run dev:web` / `npm run dev:server` — run one side
+- `npm run check` — format + lint + typecheck; `npm run fix` / `npx ultracite fix`
+- `vp test` — Vitest runner (built into vite-plus)
+
+## API conventions (REST, mounted at `/api`)
+
+- `GET /api/health` is public; everything else sits behind `createRequireAuth(auth)` middleware which attaches the better-auth session to `req.session`
+- Route files live in `packages/api/src/routes/`; mount them in `routes/index.ts`
+- Validate `req.body`/`req.query`/`req.params` with zod `safeParse`; on failure return `400 { error: "Validation failed", issues }`
+- Error shape: `{ "error": string }` (optionally `issues`). Use 401 unauthenticated, 404 missing, 201 create, 204 delete
+- ALWAYS wrap async handlers in `asyncHandler` from `packages/api/src/lib/async-handler.ts` — oxlint forbids async endpoint handlers and promise-chaining both; the wrapper satisfies both rules
+
+## Web conventions
+
+- UI components come from **ui-sdk** (`@ui-sdk/react` + `@ui-sdk/core`) — headless parts styled with Tailwind; no shadcn in this repo. Before using ui-sdk, follow the `ui-sdk` skill if it's installed, and read `node_modules/@ui-sdk/react/docs/llms.txt`. To build a new component, also search `node_modules/@ui-sdk/react/docs/core.md` by heading, and read `rendering.md` next to it. Import per entry (`@ui-sdk/react/menu`), never a root import.
+- Server calls go through `src/lib/api.ts` (`apiFetch` sends `credentials: "include"`); wrap calls in TanStack Query hooks — never raw `fetch` in components
+- Forms: `@tanstack/react-form` + zod; toasts via `sonner`
+- Env access via `ENV` from `src/env.ts` (varlock-generated; never `process.env` directly)
+
+## Infrastructure
+
+- MongoDB Atlas: project `doctor-tracker`, M0 cluster `doctor-tracker` (AWS us-east-1), db `doctor_tracker`; `DATABASE_URL` lives in `apps/server/.env` — `packages/db` imports it via varlock `@import`
+- Auth: better-auth at `/api/auth/*`; sessions are httpOnly cookies (`sameSite: none` for cross-origin dev)
+
+## Installed agent skills
+
+- `.agents/skills/` — emilkowalski UI/animation pack (animate, choreograph, break-ui, emil-design-eng, ask-sonner, animation-performance, improve-animations, find-animation-opportunities, review-animations, remove-animations, pick-ui-library, prototype, etc.). Use `break-ui` to stress-test tables, `emil-design-eng`/`review-animations` before UI reviews.
+
 # Ultracite Code Standards
 
 This project uses **Ultracite**, a zero-config preset that enforces strict code quality standards through automated formatting and linting.

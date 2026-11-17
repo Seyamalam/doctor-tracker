@@ -1,1 +1,5 @@
-@import "@doctor-tracker/ui/globals.css";
+@layer ui-sdk;
+@import "tailwindcss";
+@import "@ui-sdk/core/web.css" layer(components);
+
+@custom-variant dark (&:is(.dark *));

@@ -2,16 +2,21 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { authClient } from "@/lib/auth-client";
-import { useTRPC } from "@/utils/trpc";
+import { api } from "@/lib/api";
+import type { authClient } from "@/lib/auth-client";
 
-export default function Dashboard({ session }: { session: typeof authClient.$Infer.Session }) {
-  const trpc = useTRPC();
-  const privateData = useQuery(trpc.privateData.queryOptions());
+const Dashboard = ({
+  session,
+}: {
+  session: typeof authClient.$Infer.Session;
+}) => {
+  const privateData = useQuery({ queryFn: api.me, queryKey: ["me"] });
 
   return (
-    <>
-      <p>API: {privateData.data?.message}</p>
-    </>
+    <p>
+      API: {privateData.data?.message} — signed in as {session.user.name}
+    </p>
   );
-}
+};
+
+export default Dashboard;
