@@ -1,33 +1,26 @@
+"use client";
+
 import { Button } from "@ui-sdk/react/button";
-import {
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuSeparator,
-  MenuTrigger,
-} from "@ui-sdk/react/menu";
+import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@ui-sdk/react/menu";
+import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { btn, cx, menuItemCls, popupAnimCls, popupCls } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
-
-const triggerClass =
-  "rounded-md border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700";
 
 const UserMenu = () => {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
-    return (
-      <div className="h-9 w-24 animate-pulse rounded-md bg-gray-200 dark:bg-gray-800" />
-    );
+    return <div className="skeleton h-9 w-24" />;
   }
 
   if (!session) {
     return (
       <Link href="/login">
-        <Button className={triggerClass}>Sign In</Button>
+        <Button className={btn.primary}>Sign In</Button>
       </Link>
     );
   }
@@ -46,11 +39,21 @@ const UserMenu = () => {
         }
       }}
     >
-      <MenuTrigger className={triggerClass}>{session.user.name}</MenuTrigger>
-      <MenuContent className="rounded-md border border-gray-200 bg-white p-1 shadow-md dark:border-gray-800 dark:bg-gray-950">
-        <MenuItem value="email">{session.user.email}</MenuItem>
-        <MenuSeparator />
-        <MenuItem className="text-red-600" value="sign-out">
+      <MenuTrigger className={cx(btn.ghost, "max-w-36 truncate border border-border bg-card")}>
+        {session.user.name}
+      </MenuTrigger>
+      <MenuContent
+        align="end"
+        className={cx(popupCls, popupAnimCls, "w-48 p-1")}
+        side="bottom"
+        sideOffset={4}
+      >
+        <MenuItem className={cx(menuItemCls, "truncate text-muted-foreground")} value="email">
+          {session.user.email}
+        </MenuItem>
+        <MenuSeparator className="bg-border my-1 h-px" />
+        <MenuItem className={cx(menuItemCls, "text-danger")} value="sign-out">
+          <LogOut className="h-3.5 w-3.5" />
           Sign Out
         </MenuItem>
       </MenuContent>

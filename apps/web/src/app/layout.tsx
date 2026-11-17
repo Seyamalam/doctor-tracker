@@ -16,8 +16,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  description: "doctor-tracker",
-  title: "doctor-tracker",
+  description: "Admin dashboard for managing doctors and patients",
+  title: {
+    default: "Doctor Tracker — Admin",
+    template: "%s — Doctor Tracker",
+  },
 };
 
 const RootLayout = ({
@@ -28,7 +31,7 @@ const RootLayout = ({
   <html lang="en" suppressHydrationWarning>
     <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
       <Providers>
-        <div className="grid h-svh grid-rows-[auto_1fr]">
+        <div className="grid min-h-dvh grid-rows-[auto_1fr]">
           <Header />
           {children}
         </div>
