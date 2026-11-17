@@ -23,12 +23,14 @@ const initials = (name: string) =>
     .map((part) => part[0]?.toUpperCase())
     .join("");
 
-const UserMenu = () => {
+const UserMenu = ({ compact }: { compact?: boolean }) => {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
-    return <div className="skeleton h-11 w-full min-w-36" />;
+    return (
+      <div className={cx("skeleton", compact ? "h-9 w-9 rounded-full" : "h-11 w-full min-w-36")} />
+    );
   }
 
   if (!session) {
@@ -51,7 +53,10 @@ const UserMenu = () => {
     >
       <MenuTrigger
         aria-label={`Account menu for ${session.user.name}`}
-        className="hover:bg-muted focus-visible:outline-ring flex min-w-0 flex-1 items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none"
+        className={cx(
+          "hover:bg-muted focus-visible:outline-ring flex min-w-0 items-center gap-2.5 rounded-lg text-left transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none",
+          compact ? "justify-center p-1.5" : "flex-1 px-2 py-1.5",
+        )}
       >
         <span
           aria-hidden="true"
@@ -59,20 +64,27 @@ const UserMenu = () => {
         >
           {initials(session.user.name)}
         </span>
-        <span className="flex min-w-0 flex-1 flex-col">
-          <span className="text-foreground truncate text-[13px] leading-tight font-medium">
-            {session.user.name}
-          </span>
-          <span className="text-muted-foreground truncate text-[11px] leading-tight capitalize">
-            {session.user.role ?? "viewer"}
-          </span>
-        </span>
-        <ChevronsUpDown aria-hidden="true" className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
+        {compact ? null : (
+          <>
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="text-foreground truncate text-[13px] leading-tight font-medium">
+                {session.user.name}
+              </span>
+              <span className="text-muted-foreground truncate text-[11px] leading-tight capitalize">
+                {session.user.role ?? "viewer"}
+              </span>
+            </span>
+            <ChevronsUpDown
+              aria-hidden="true"
+              className="text-muted-foreground h-3.5 w-3.5 shrink-0"
+            />
+          </>
+        )}
       </MenuTrigger>
       <MenuContent
         align="start"
         className={cx(popupCls, popupAnimCls, "w-56 p-1")}
-        side="top"
+        side={compact ? "right" : "top"}
         sideOffset={6}
       >
         <MenuGroup>

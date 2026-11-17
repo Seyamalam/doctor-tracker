@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select";
-import { Search } from "lucide-react";
+import { Download, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { selectContentCls, selectTriggerCls } from "@/components/form-fields";
@@ -171,6 +171,28 @@ export const DateRangeFilters = () => {
         />
       </div>
     </>
+  );
+};
+
+export const ExportCsvButton = ({ onExport }: { onExport: () => Promise<void> }) => {
+  const [busy, setBusy] = useState(false);
+  return (
+    <button
+      className={btn.outline}
+      disabled={busy}
+      onClick={async () => {
+        setBusy(true);
+        try {
+          await onExport();
+        } finally {
+          setBusy(false);
+        }
+      }}
+      type="button"
+    >
+      <Download aria-hidden="true" className="h-4 w-4" />
+      {busy ? "Exporting…" : "Export CSV"}
+    </button>
   );
 };
 

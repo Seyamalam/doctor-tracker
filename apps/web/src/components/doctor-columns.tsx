@@ -4,6 +4,7 @@ import type { Route } from "next";
 import Link from "next/link";
 
 import { RowActionsMenu } from "@/components/data-table";
+import { Badge, CellAvatar } from "@/components/ui";
 import type { Doctor } from "@/lib/api";
 import { formatDate } from "@/lib/format";
 
@@ -22,20 +23,23 @@ export const doctorColumns = ({ canMutate = true, onEdit, onDelete }: DoctorColu
   helper.columns([
     helper.accessor("name", {
       cell: (ctx) => (
-        <Link
-          className="text-primary block max-w-40 truncate font-medium hover:underline"
-          href={`/doctors/${ctx.row.original.id}` as Route}
-          title={ctx.getValue()}
-        >
-          {ctx.getValue()}
-        </Link>
+        <span className="flex items-center gap-2.5">
+          <CellAvatar name={ctx.getValue()} />
+          <Link
+            className="text-foreground block max-w-44 truncate font-medium hover:text-primary hover:underline"
+            href={`/doctors/${ctx.row.original.id}` as Route}
+            title={ctx.getValue()}
+          >
+            {ctx.getValue()}
+          </Link>
+        </span>
       ),
       header: "Name",
     }),
     helper.accessor("specialization", {
       cell: (ctx) => (
         <span className="block max-w-36 truncate" title={ctx.getValue()}>
-          {ctx.getValue()}
+          <Badge>{ctx.getValue()}</Badge>
         </span>
       ),
       header: "Specialization",
@@ -49,7 +53,7 @@ export const doctorColumns = ({ canMutate = true, onEdit, onDelete }: DoctorColu
       header: "Hospital",
     }),
     helper.accessor("phone", {
-      cell: (ctx) => <span className="text-muted-foreground">{ctx.getValue()}</span>,
+      cell: (ctx) => <span className="text-muted-foreground tabular-nums">{ctx.getValue()}</span>,
       header: "Phone",
     }),
     helper.accessor("email", {

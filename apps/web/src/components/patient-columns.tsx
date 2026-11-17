@@ -4,6 +4,7 @@ import type { Route } from "next";
 import Link from "next/link";
 
 import { RowActionsMenu } from "@/components/data-table";
+import { Badge, CellAvatar } from "@/components/ui";
 import type { Patient } from "@/lib/api";
 import { formatDate } from "@/lib/format";
 
@@ -28,8 +29,11 @@ export const patientColumns = ({
   helper.columns([
     helper.accessor("name", {
       cell: (ctx) => (
-        <span className="block max-w-44 truncate font-medium" title={ctx.getValue()}>
-          {ctx.getValue()}
+        <span className="flex items-center gap-2.5">
+          <CellAvatar name={ctx.getValue()} tone="muted" />
+          <span className="block max-w-44 truncate font-medium" title={ctx.getValue()}>
+            {ctx.getValue()}
+          </span>
         </span>
       ),
       header: "Name",
@@ -37,7 +41,7 @@ export const patientColumns = ({
     helper.accessor("condition", {
       cell: (ctx) => (
         <span className="block max-w-52 truncate" title={ctx.getValue()}>
-          {ctx.getValue()}
+          <Badge tone="primary">{ctx.getValue()}</Badge>
         </span>
       ),
       header: "Condition",

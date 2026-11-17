@@ -49,7 +49,7 @@ export const DataTable = <TData extends RowData>({
             <tr className="border-border bg-muted/50 border-b" key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
-                  className="text-muted-foreground relative h-10 px-3 align-middle text-xs font-medium whitespace-nowrap"
+                  className="text-muted-foreground relative h-10 px-3 align-middle text-[11px] font-medium uppercase tracking-[0.06em] whitespace-nowrap"
                   key={header.id}
                   scope="col"
                 >
@@ -77,7 +77,7 @@ export const DataTable = <TData extends RowData>({
                 >
                   {row.getAllCells().map((cell) => (
                     /* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- FlexRender supplies the cell's content */
-                    <td className="px-3 py-2.5 whitespace-nowrap" key={cell.id}>
+                    <td className="px-3 py-3 whitespace-nowrap" key={cell.id}>
                       <table.FlexRender cell={cell} />
                     </td>
                   ))}

@@ -20,6 +20,7 @@ import {
 } from "recharts";
 
 import { btn, Card, EmptyState, PageHeader, Skeleton } from "@/components/ui";
+import { authClient } from "@/lib/auth-client";
 import { formatDate, formatDayLabel } from "@/lib/format";
 import { useStats } from "@/lib/hooks/use-stats";
 
@@ -43,7 +44,7 @@ const StatCard = ({
   <Card className="flex items-start justify-between gap-3 p-4">
     <div className="min-w-0">
       <p className="text-muted-foreground text-[13px] font-medium">{label}</p>
-      <p className="mt-1 text-2xl font-semibold tracking-tight">{value}</p>
+      <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
       {sub ? <p className="text-muted-foreground mt-0.5 truncate text-xs">{sub}</p> : null}
     </div>
     <div className="bg-primary/10 text-primary rounded-lg p-2">
@@ -91,8 +92,9 @@ export const DashboardSkeleton = () => (
   </main>
 );
 
-const Dashboard = ({ name }: { name: string }) => {
+const Dashboard = () => {
   const stats = useStats();
+  const { data: session } = authClient.useSession();
 
   if (stats.isPending) {
     return <DashboardSkeleton />;
@@ -147,7 +149,7 @@ const Dashboard = ({ name }: { name: string }) => {
   return (
     <main className="anim-enter mx-auto w-full max-w-6xl px-4 py-6">
       <PageHeader
-        description={`Welcome back, ${name}. Here's your practice at a glance.`}
+        description={`Welcome back${session?.user?.name ? `, ${session.user.name}` : ""}. Here's your practice at a glance.`}
         title="Dashboard"
       />
 

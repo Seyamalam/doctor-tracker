@@ -62,6 +62,52 @@ export const Skeleton = ({ className }: { className?: string }) => (
   <div aria-hidden="true" className={cx("skeleton", className)} />
 );
 
+export const badgeCls =
+  "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium whitespace-nowrap";
+
+export const Badge = ({
+  children,
+  tone = "muted",
+}: {
+  children: ReactNode;
+  tone?: "muted" | "primary";
+}) => (
+  <span
+    className={cx(
+      badgeCls,
+      tone === "primary" ? "bg-primary/10 text-primary" : "bg-muted text-foreground",
+    )}
+  >
+    {children}
+  </span>
+);
+
+const initialsOf = (name: string) =>
+  name
+    .split(/\s+/u)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+
+export const CellAvatar = ({
+  name,
+  tone = "primary",
+}: {
+  name: string;
+  tone?: "muted" | "primary";
+}) => (
+  <span
+    aria-hidden="true"
+    className={cx(
+      "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold",
+      tone === "primary" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground",
+    )}
+  >
+    {initialsOf(name)}
+  </span>
+);
+
 export const FieldErrors = ({ errors }: { errors: unknown[] }) => {
   const messages = errors
     .map((error) => {

@@ -10,7 +10,7 @@ const LoginPage = () => {
   const [showSignIn, setShowSignIn] = useState(true);
 
   return (
-    <div className="flex min-h-[calc(100dvh-3.5rem)] items-center justify-center px-4 py-10">
+    <div className="bg-[radial-gradient(60rem_40rem_at_50%_-10%,var(--color-primary)/8%,transparent)] flex min-h-dvh items-center justify-center px-4 py-10">
       <div className="anim-enter w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
           <Logo className="h-9 w-9" />

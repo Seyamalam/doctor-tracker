@@ -11,6 +11,7 @@ import { PatientFormDialog } from "@/components/patient-form";
 import {
   ClearFiltersButton,
   DateRangeFilters,
+  ExportCsvButton,
   FilterSelect,
   SearchInput,
   SortSelect,
@@ -18,6 +19,9 @@ import {
 } from "@/components/table-toolbar";
 import { btn, cx, PageHeader, Skeleton } from "@/components/ui";
 import type { Patient, PatientsParams } from "@/lib/api";
+import { api } from "@/lib/api";
+import { downloadCsv, EXPORT_PAGE_SIZE, fetchAllPages } from "@/lib/csv";
+import { formatDate } from "@/lib/format";
 import { useDoctorOptions } from "@/lib/hooks/use-doctors";
 import { useConditions, useDeletePatient, usePatients } from "@/lib/hooks/use-patients";
 import { useIsAdmin } from "@/lib/hooks/use-role";
@@ -91,9 +95,26 @@ export const PatientsView = () => {
       to: null,
     });
 
+  const exportCsv = async () => {
+    const rows = await fetchAllPages((page) =>
+      api.patients.list({ ...listParams, limit: EXPORT_PAGE_SIZE, page }),
+    );
+    downloadCsv(
+      "patients.csv",
+      ["Name", "Condition", "Doctor", "Added"],
+      rows.map((patient) => [
+        patient.name,
+        patient.condition,
+        patient.doctor?.name ?? "Unassigned",
+        formatDate(patient.createdAt),
+      ]),
+    );
+  };
+
   return (
     <main className="anim-enter mx-auto w-full max-w-6xl px-4 py-6">
       <PageHeader description="Manage patients and their doctor assignments" title="Patients">
+        <ExportCsvButton onExport={exportCsv} />
         {isAdmin ? (
           <button className={btn.primary} onClick={() => setFormTarget("new")} type="button">
             <Plus className="h-4 w-4" />

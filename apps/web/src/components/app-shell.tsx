@@ -7,17 +7,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/react/dialog";
-import { LayoutDashboard, Menu as MenuIcon, Stethoscope, Users } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip";
+import {
+  LayoutDashboard,
+  Menu as MenuIcon,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Stethoscope,
+  Users,
+} from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 import { backdropCls } from "@/components/dialogs";
 import { Logo } from "@/components/logo";
 import { ModeToggle } from "@/components/mode-toggle";
-import { btn, cx } from "@/components/ui";
+import { btn, cx, popupAnimCls, popupCls } from "@/components/ui";
 import UserMenu from "@/components/user-menu";
+
+const COLLAPSED_KEY = "dt.sidebar.collapsed";
 
 const links = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
@@ -27,51 +38,109 @@ const links = [
 
 const isActive = (pathname: string, to: string) => pathname === to || pathname.startsWith(`${to}/`);
 
-const Brand = () => (
+const isEditableTarget = (target: EventTarget | null) =>
+  target instanceof HTMLElement &&
+  (target.isContentEditable ||
+    target.tagName === "INPUT" ||
+    target.tagName === "TEXTAREA" ||
+    target.tagName === "SELECT");
+
+const Brand = ({ collapsed }: { collapsed?: boolean }) => (
   <Link
-    className="focus-visible:outline-ring flex items-center gap-2.5 rounded-md px-2 py-1.5 transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2"
+    className="flex items-center gap-2.5 rounded-md px-2 py-1.5 transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     href="/dashboard"
   >
-    <Logo className="h-7 w-7" />
-    <span className="flex flex-col">
-      <span className="text-sm font-semibold tracking-tight">Doctor Tracker</span>
-      <span className="text-muted-foreground text-[11px]">Admin console</span>
-    </span>
+    <Logo className="h-7 w-7 shrink-0" />
+    {collapsed ? null : (
+      <span className="flex min-w-0 flex-col">
+        <span className="text-sm font-semibold tracking-tight">Doctor Tracker</span>
+        <span className="text-muted-foreground text-[11px]">Admin console</span>
+      </span>
+    )}
   </Link>
 );
 
-const NavList = ({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) => (
+const NavLink = ({
+  collapsed,
+  icon: Icon,
+  label,
+  onNavigate,
+  pathname,
+  to,
+}: {
+  collapsed?: boolean;
+  icon: typeof LayoutDashboard;
+  label: string;
+  onNavigate?: () => void;
+  pathname: string;
+  to: string;
+}) => {
+  const active = isActive(pathname, to);
+  const link = (
+    <Link
+      aria-current={active ? "page" : undefined}
+      aria-label={collapsed ? label : undefined}
+      className={cx(
+        "group relative flex h-10 items-center gap-2.5 rounded-lg font-medium text-sm transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transition-none",
+        collapsed ? "justify-center px-0" : "px-3",
+        active
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+      )}
+      href={to as Route}
+      onClick={onNavigate}
+    >
+      <span
+        aria-hidden="true"
+        className={cx(
+          "absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-primary transition-opacity duration-150 motion-reduce:transition-none",
+          active ? "opacity-100" : "opacity-0",
+          collapsed && "left-[-3px]",
+        )}
+      />
+      <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
+      {collapsed ? null : label}
+    </Link>
+  );
+  if (!collapsed) {
+    return link;
+  }
+  return (
+    <Tooltip>
+      <TooltipTrigger render={link} />
+      <TooltipContent className={cx(popupCls, popupAnimCls, "px-2.5 py-1.5 text-xs")} side="right">
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  );
+};
+
+const NavList = ({
+  collapsed,
+  pathname,
+  onNavigate,
+}: {
+  collapsed?: boolean;
+  pathname: string;
+  onNavigate?: () => void;
+}) => (
   <nav aria-label="Main" className="flex flex-col gap-1">
-    <p className="text-muted-foreground px-3 pb-1.5 text-[11px] font-medium tracking-[0.08em] uppercase">
-      Workspace
-    </p>
-    {links.map(({ to, label, icon: Icon }) => {
-      const active = isActive(pathname, to);
-      return (
-        <Link
-          aria-current={active ? "page" : undefined}
-          className={cx(
-            "group relative flex h-10 items-center gap-2.5 rounded-lg px-3 font-medium text-sm transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transition-none",
-            active
-              ? "bg-primary/10 text-primary"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground",
-          )}
-          href={to as Route}
-          key={to}
-          onClick={onNavigate}
-        >
-          <span
-            aria-hidden="true"
-            className={cx(
-              "absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-primary transition-opacity duration-150 motion-reduce:transition-none",
-              active ? "opacity-100" : "opacity-0",
-            )}
-          />
-          <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
-          {label}
-        </Link>
-      );
-    })}
+    {collapsed ? null : (
+      <p className="text-muted-foreground px-3 pb-1.5 text-[11px] font-medium uppercase tracking-[0.08em]">
+        Workspace
+      </p>
+    )}
+    {links.map(({ to, label, icon }) => (
+      <NavLink
+        collapsed={collapsed}
+        icon={icon}
+        key={to}
+        label={label}
+        onNavigate={onNavigate}
+        pathname={pathname}
+        to={to}
+      />
+    ))}
   </nav>
 );
 
@@ -81,6 +150,33 @@ const drawerCls =
 const AppShell = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setCollapsed(window.localStorage.getItem(COLLAPSED_KEY) === "1");
+  }, []);
+
+  const toggleCollapsed = () =>
+    setCollapsed((value) => {
+      window.localStorage.setItem(COLLAPSED_KEY, value ? "0" : "1");
+      return !value;
+    });
+
+  useEffect(() => {
+    const onKeydown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || isEditableTarget(event.target)) {
+        return;
+      }
+      if (event.key === "b") {
+        toggleCollapsed();
+      } else if (event.key === "d") {
+        setTheme(resolvedTheme === "dark" ? "light" : "dark");
+      }
+    };
+    window.addEventListener("keydown", onKeydown);
+    return () => window.removeEventListener("keydown", onKeydown);
+  }, [resolvedTheme, setTheme]);
 
   if (pathname === "/login") {
     return children;
@@ -90,20 +186,53 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <aside className="bg-card border-border fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r lg:flex">
-        <div className="px-4 pt-5 pb-4">
-          <Brand />
+      <aside
+        className={cx(
+          "bg-card border-border fixed inset-y-0 left-0 z-30 hidden flex-col border-r transition-[width] duration-200 ease-out motion-reduce:transition-none lg:flex",
+          collapsed ? "w-16" : "w-64",
+        )}
+      >
+        <div className={cx("pb-4 pt-5", collapsed ? "px-3" : "px-4")}>
+          <Brand collapsed={collapsed} />
         </div>
-        <div className="flex-1 px-3">
-          <NavList pathname={pathname} />
+        <div className={cx("flex-1", collapsed ? "px-2" : "px-3")}>
+          <NavList collapsed={collapsed} pathname={pathname} />
         </div>
-        <div className="border-border flex items-center justify-between gap-2 border-t p-3">
-          <UserMenu />
-          <ModeToggle />
+        <div
+          className={cx(
+            "border-border flex items-center gap-1 border-t p-3",
+            collapsed ? "flex-col" : "justify-between",
+          )}
+        >
+          <UserMenu compact={collapsed} />
+          <div className="flex items-center gap-1">
+            <ModeToggle />
+            <Tooltip>
+              <TooltipTrigger
+                aria-keyshortcuts="b"
+                aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                className={btn.icon}
+                onClick={toggleCollapsed}
+                type="button"
+              >
+                {collapsed ? (
+                  <PanelLeftOpen aria-hidden="true" className="h-4 w-4" />
+                ) : (
+                  <PanelLeftClose aria-hidden="true" className="h-4 w-4" />
+                )}
+              </TooltipTrigger>
+              <TooltipContent
+                className={cx(popupCls, popupAnimCls, "px-2.5 py-1.5 text-xs")}
+                side={collapsed ? "right" : "top"}
+              >
+                {collapsed ? "Expand sidebar" : "Collapse sidebar"} (B)
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
       </aside>
 
-      <div className="border-border bg-card sticky top-0 z-30 flex h-14 items-center gap-2 border-b px-3 pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] lg:hidden">
+      <div className="border-border bg-card sticky top-0 z-30 flex h-14 items-center gap-2 border-b px-3 pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] lg:hidden">
         <Dialog onOpenChange={setDrawerOpen} open={drawerOpen}>
           <DialogTrigger
             aria-expanded={drawerOpen}
@@ -130,7 +259,14 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
         <Brand />
       </div>
 
-      <div className="lg:pl-64">{children}</div>
+      <div
+        className={cx(
+          "transition-[padding] duration-200 ease-out motion-reduce:transition-none",
+          collapsed ? "lg:pl-16" : "lg:pl-64",
+        )}
+      >
+        {children}
+      </div>
     </>
   );
 };
