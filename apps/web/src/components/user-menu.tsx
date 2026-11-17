@@ -57,8 +57,11 @@ const UserMenu = () => {
         sideOffset={4}
       >
         <MenuGroup>
-          <MenuGroupLabel className="text-muted-foreground truncate px-2.5 py-1.5 text-sm">
-            {session.user.email}
+          <MenuGroupLabel className="text-muted-foreground flex items-center justify-between gap-2 px-2.5 py-1.5 text-sm">
+            <span className="truncate">{session.user.email}</span>
+            <span className="bg-primary/10 text-primary shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium capitalize">
+              {session.user.role ?? "viewer"}
+            </span>
           </MenuGroupLabel>
         </MenuGroup>
         <MenuSeparator className="bg-border my-1 h-px" />

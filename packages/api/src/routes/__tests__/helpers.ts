@@ -24,6 +24,7 @@ const TEST_SESSION = {
     emailVerified: true,
     id: "user_test",
     name: "Test Admin",
+    role: "admin",
     updatedAt: new Date(),
   },
 };
@@ -37,6 +38,11 @@ const buildApp = (session: unknown): Express => {
 };
 
 export const authedApp = (): Express => buildApp(TEST_SESSION);
+export const viewerApp = (): Express =>
+  buildApp({
+    ...TEST_SESSION,
+    user: { ...TEST_SESSION.user, role: "viewer" },
+  });
 export const anonApp = (): Express => buildApp(null);
 
 export const connectTestDb = async (): Promise<MongoMemoryServer> => {

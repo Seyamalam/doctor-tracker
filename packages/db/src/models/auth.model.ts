@@ -11,6 +11,7 @@ const userSchema = new Schema(
     emailVerified: { default: false, required: true, type: Boolean },
     image: { type: String },
     name: { required: true, type: String },
+    role: { default: "admin", enum: ["admin", "viewer"], type: String },
     updatedAt: { default: Date.now, required: true, type: Date },
   },
   { collection: "user" },

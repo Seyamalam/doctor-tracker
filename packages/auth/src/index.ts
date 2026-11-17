@@ -27,6 +27,16 @@ export const createAuth = (
     plugins: [],
     secret: env.BETTER_AUTH_SECRET,
     trustedOrigins: [env.CORS_ORIGIN, ...desktopOrigins],
+    user: {
+      additionalFields: {
+        role: {
+          defaultValue: "admin",
+          input: false,
+          required: false,
+          type: "string",
+        },
+      },
+    },
   });
 
 export type Session = ReturnType<typeof createAuth>["$Infer"]["Session"];
