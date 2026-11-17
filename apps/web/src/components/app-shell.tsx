@@ -70,6 +70,7 @@ const isEditableTarget = (target: EventTarget | null) =>
 
 const Brand = ({ collapsed }: { collapsed?: boolean }) => (
   <Link
+    aria-label={collapsed ? "Doctor Tracker home" : undefined}
     className="focus-visible:outline-ring flex items-center gap-2.5 rounded-md px-2 py-1.5 transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2"
     href="/dashboard"
   >
