@@ -146,7 +146,7 @@ export const api = {
         body: JSON.stringify(data),
         method: "POST",
       }),
-    get: (id: string) => request<Doctor>(`/doctors/${id}`),
+    get: (id: string, init?: RequestInit) => request<Doctor>(`/doctors/${id}`, init),
     list: (params: DoctorsParams) =>
       request<Paginated<Doctor>>(`/doctors${toQuery({ ...params })}`),
     patients: (id: string, params: DoctorPatientsParams) =>

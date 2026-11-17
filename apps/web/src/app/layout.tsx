@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "../index.css";
 import Header from "@/components/header";
 import Providers from "@/components/providers";
+import { ENV } from "@/env";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -15,11 +16,40 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
 });
 
+const siteDescription =
+  "Secure admin portal for managing doctors and their patients — CRUD, search, filters, pagination and dashboard analytics on Next.js, Express and MongoDB.";
+
 export const metadata: Metadata = {
-  description: "Admin dashboard for managing doctors and patients",
+  applicationName: "Doctor Tracker",
+  authors: [{ name: "Seyam Alam", url: "https://github.com/Seyamalam" }],
+  creator: "Seyam Alam",
+  description: siteDescription,
+  keywords: [
+    "doctor tracker",
+    "patient management",
+    "admin dashboard",
+    "healthcare",
+    "next.js",
+    "express",
+    "mongodb",
+  ],
+  metadataBase: new URL(ENV.NEXT_PUBLIC_APP_URL || "https://doctor-tracker-tau-sage.vercel.app"),
+  openGraph: {
+    description: siteDescription,
+    siteName: "Doctor Tracker",
+    title: "Doctor Tracker — Admin",
+    type: "website",
+    url: "/",
+  },
+  robots: { follow: true, index: true },
   title: {
     default: "Doctor Tracker — Admin",
     template: "%s — Doctor Tracker",
+  },
+  twitter: {
+    card: "summary_large_image",
+    description: siteDescription,
+    title: "Doctor Tracker — Admin",
   },
 };
 
