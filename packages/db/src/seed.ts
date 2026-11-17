@@ -6,24 +6,190 @@ import { Doctor } from "./models/doctor.model";
 import { Patient } from "./models/patient.model";
 
 const DAY_MS = 86_400_000;
-const SPREAD_DAYS = 45;
+const DOCTOR_COUNT = Number(process.env.SEED_DOCTORS ?? 50);
+const PATIENT_COUNT = Number(process.env.SEED_PATIENTS ?? 500);
+const DOCTOR_SPREAD_DAYS = 365;
+const PATIENT_SPREAD_DAYS = 120;
+const INSERT_CHUNK = 10_000;
 
-const DOCTORS = [
-  ["Dr. Amelia Chen", "Cardiology", "St. Mary's Medical Center", "+1 (415) 555-0142"],
-  ["Dr. Marcus Webb", "Cardiology", "Riverside General Hospital", "+1 (212) 555-0198"],
-  ["Dr. Priya Raghavan", "Neurology", "University Medical Center", "+1 (312) 555-0167"],
-  ["Dr. Tomas Eriksson", "Neurology", "Northgate Clinic", "+1 (206) 555-0134"],
-  ["Dr. Sofia Alvarez", "Pediatrics", "Children's Care Hospital", "+1 (617) 555-0119"],
-  ["Dr. James Okafor", "Pediatrics", "Riverside General Hospital", "+1 (310) 555-0176"],
-  ["Dr. Hannah Lindqvist", "Orthopedics", "Summit Orthopedic Institute", "+1 (404) 555-0151"],
-  ["Dr. Raj Mehta", "Dermatology", "Clearview Dermatology Center", "+1 (503) 555-0123"],
-  ["Dr. Elena Petrova", "Oncology", "Hope Cancer Institute", "+1 (512) 555-0188"],
-  ["Dr. David Kim", "Oncology", "University Medical Center", "+1 (303) 555-0145"],
-  ["Dr. Sarah Mitchell", "General Medicine", "Lakeside Family Clinic", "+1 (215) 555-0172"],
-  ["Dr. Omar Hassan", "General Medicine", "Northgate Clinic", "+1 (646) 555-0111"],
-  ["Dr. Ingrid Bauer", "Psychiatry", "Willowbrook Behavioral Health", "+1 (773) 555-0194"],
-  ["Dr. Nathan Cole", "Radiology", "Summit Imaging Center", "+1 (415) 555-0160"],
-  ["Dr. Yuki Tanaka", "Ophthalmology", "Brightview Eye Institute", "+1 (206) 555-0138"],
+// Deterministic PRNG so reseeds produce the same dataset.
+const mulberry32 = (seed: number) => () => {
+  seed = (seed + 0x6d_2b_79_f5) | 0;
+  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4_294_967_296;
+};
+
+const rand = mulberry32(0x51_33_7);
+
+const pick = <T>(items: readonly T[]): T => items[Math.floor(rand() * items.length)] as T;
+
+const pickWeighted = (items: readonly string[], weights: readonly number[]): string => {
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  let roll = rand() * total;
+  for (const [index, weight] of weights.entries()) {
+    roll -= weight;
+    if (roll <= 0) {
+      return items[index] as string;
+    }
+  }
+  return items[0] as string;
+};
+
+const FIRST_NAMES = [
+  "Arif",
+  "Tanvir",
+  "Nusrat",
+  "Ayesha",
+  "Farhana",
+  "Rahim",
+  "Sharmin",
+  "Taslima",
+  "Imran",
+  "Sabrina",
+  "Mahmud",
+  "Rumana",
+  "Fahim",
+  "Nadia",
+  "Rashed",
+  "Shirin",
+  "Kamal",
+  "Rehana",
+  "Zahid",
+  "Mousumi",
+  "Ashraf",
+  "Dilara",
+  "Nur",
+  "Salma",
+  "Rafiq",
+  "Jesmin",
+  "Sohel",
+  "Mahfuza",
+  "Anwar",
+  "Tahmina",
+  "Rony",
+  "Sharifa",
+  "Selim",
+  "Nasrin",
+  "Farid",
+  "Laila",
+  "Bashar",
+  "Roksana",
+  "Jamal",
+  "Parvin",
+  "Shakil",
+  "Munira",
+  "Tareq",
+  "Bithi",
+  "Mizanur",
+  "Hasina",
+  "Liton",
+  "Razia",
+  "Nazmul",
+  "Shamima",
+  "Masud",
+  "Kohinoor",
+  "Jahid",
+  "Fatema",
+  "Rasel",
+  "Morsheda",
+  "Shahid",
+  "Ferdousi",
+  "Naim",
+  "Rokeya",
+  "Habib",
+  "Mst. Anwara",
+  "Moinul",
+  "Suraiya",
+  "Palash",
+  "Jannatul",
+  "Rezaul",
+  "Shapla",
+] as const;
+
+const LAST_NAMES = [
+  "Rahman",
+  "Islam",
+  "Hossain",
+  "Haque",
+  "Ahmed",
+  "Chowdhury",
+  "Khan",
+  "Uddin",
+  "Karim",
+  "Alam",
+  "Hasan",
+  "Mia",
+  "Sarker",
+  "Bhuiyan",
+  "Sheikh",
+  "Talukder",
+  "Molla",
+  "Das",
+  "Mondal",
+  "Biswas",
+  "Roy",
+  "Saha",
+  "Sen",
+  "Ghosh",
+  "Chakraborty",
+  "Paul",
+  "Barua",
+  "Akhand",
+  "Ferdous",
+  "Hawlader",
+  "Sikder",
+  "Mazumder",
+  "Kundu",
+  "Barman",
+  "Nath",
+  "Khatun",
+] as const;
+
+const SPECIALIZATIONS = [
+  "Cardiology",
+  "Neurology",
+  "Pediatrics",
+  "Orthopedics",
+  "Dermatology",
+  "Oncology",
+  "General Medicine",
+  "Psychiatry",
+  "Radiology",
+  "Ophthalmology",
+  "Endocrinology",
+  "Gastroenterology",
+  "Pulmonology",
+  "Nephrology",
+  "Rheumatology",
+  "Anesthesiology",
+  "Emergency Medicine",
+  "Family Medicine",
+  "Internal Medicine",
+  "Obstetrics",
+  "Urology",
+  "Hematology",
+  "Infectious Disease",
+  "Geriatrics",
+] as const;
+
+const HOSPITALS = [
+  "Dhaka Medical College Hospital",
+  "Bangabandhu Sheikh Mujib Medical University",
+  "Square Hospital",
+  "Evercare Hospital Dhaka",
+  "United Hospital",
+  "Ibn Sina Hospital",
+  "Labaid Specialized Hospital",
+  "Popular Diagnostic Centre",
+  "BRB Hospital",
+  "BIRDEM General Hospital",
+  "Shaheed Suhrawardy Medical College Hospital",
+  "Sir Salimullah Medical College Hospital",
+  "Kurmitola General Hospital",
+  "Mugda Medical College Hospital",
+  "Anwer Khan Modern Medical College Hospital",
+  "Dhaka Community Hospital",
 ] as const;
 
 const CONDITIONS = [
@@ -49,71 +215,8 @@ const CONDITIONS = [
   "Sinusitis",
 ] as const;
 
-const PATIENT_NAMES = [
-  "Oliver Grant",
-  "Emma Richardson",
-  "Liam Foster",
-  "Ava Delgado",
-  "Noah Whitfield",
-  "Isabella Marsh",
-  "Ethan Caldwell",
-  "Mia Thornton",
-  "Lucas Beaumont",
-  "Charlotte Reyes",
-  "Henry Castillo",
-  "Amelia Vance",
-  "Sebastian Lowe",
-  "Harper Quinn",
-  "Jack Donnelly",
-  "Evelyn Sharp",
-  "Owen Mercer",
-  "Abigail Frost",
-  "Leo Sandoval",
-  "Ella Chambers",
-  "Julian Pratt",
-  "Grace Holloway",
-  "Wyatt Sinclair",
-  "Chloe Abbott",
-  "Gabriel Roach",
-  "Lily Davenport",
-  "Isaac McConnell",
-  "Zoe Pruitt",
-  "Caleb Rowe",
-  "Nora Gaines",
-  "Dominic Waller",
-  "Stella Rios",
-  "Aaron McKee",
-  "Hazel Bright",
-  "Christian Hobbs",
-  "Violet Lutz",
-  "Jonathan Sykes",
-  "Aurora Blevins",
-  "Levi Contreras",
-  "Savannah McCann",
-  "Christopher York",
-  "Brooklyn Steele",
-  "Hunter Wiley",
-  "Bella O'Donnell",
-  "Andrew Pena",
-  "Claire Munoz",
-  "Joshua Barron",
-  "Lucy Hale",
-  "Ryan Decker",
-  "Paisley Krause",
-  "Nathaniel Sexton",
-  "Everly Conrad",
-  "Thomas Battle",
-  "Scarlett Nolan",
-  "Charles Pineda",
-  "Madison Cote",
-  "Samuel Vickers",
-  "Avery Duke",
-  "David Harrell",
-  "Sofia Lanier",
-] as const;
-
-// Deterministic per-doctor patient counts summing to 60.
-const PATIENTS_PER_DOCTOR = [4, 3, 5, 4, 6, 3, 4, 5, 3, 4, 4, 5, 4, 3, 3];
+// Skew toward the first six conditions so the donut chart has a clear shape.
+const CONDITION_WEIGHTS = [14, 12, 10, 8, 7, 6, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1] as const;
 
 const slugify = (name: string): string =>
   name
@@ -121,22 +224,30 @@ const slugify = (name: string): string =>
     .toLowerCase()
     .replaceAll(/[^a-z]+/gu, ".");
 
-const buildDoctors = (now: number) =>
-  DOCTORS.map(([name, specialization, hospital, phone], index) => {
-    const createdAt = new Date(
-      now - ((index * 13) % SPREAD_DAYS) * DAY_MS - (index % 9) * 3_600_000,
-    );
-    return {
+// Bangladeshi mobile format, e.g. +880 1712-345678.
+const phone = (): string =>
+  `+880 1${Math.floor(rand() * 9)}${Math.floor(rand() * 10)}-${String(
+    Math.floor(rand() * 1_000_000),
+  ).padStart(6, "0")}`;
+
+const buildDoctors = (now: number) => {
+  const doctors = [];
+  for (let index = 0; index < DOCTOR_COUNT; index += 1) {
+    const name = `Dr. ${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`;
+    const createdAt = new Date(now - rand() * DOCTOR_SPREAD_DAYS * DAY_MS);
+    doctors.push({
       createdAt,
-      email: `${slugify(name)}@clinic.example.com`,
-      hospital,
+      email: `${slugify(name)}.${index}@clinic.example.com`,
+      hospital: pick(HOSPITALS),
       id: new mongoose.Types.ObjectId().toString(),
       name,
-      phone,
-      specialization,
+      phone: phone(),
+      specialization: pick(SPECIALIZATIONS),
       updatedAt: createdAt,
-    };
-  });
+    });
+  }
+  return doctors;
+};
 
 interface DoctorSeed {
   createdAt: Date;
@@ -151,32 +262,34 @@ interface DoctorSeed {
 
 const buildPatients = (doctors: DoctorSeed[], now: number) => {
   const patients = [];
-  let cursor = 0;
-  for (const [doctorIndex, count] of PATIENTS_PER_DOCTOR.entries()) {
-    const doctor = doctors[doctorIndex];
-    if (!doctor) {
-      continue;
-    }
-    for (let j = 0; j < count; j += 1) {
-      const index = cursor;
-      cursor += 1;
-      const createdAt = new Date(
-        now - ((index * 7 + doctorIndex * 3) % SPREAD_DAYS) * DAY_MS - (index % 13) * 3_600_000,
-      );
-      patients.push({
-        condition: CONDITIONS[index % CONDITIONS.length],
-        createdAt,
-        doctorId: doctor.id,
-        id: new mongoose.Types.ObjectId().toString(),
-        name: PATIENT_NAMES[index % PATIENT_NAMES.length],
-        updatedAt: createdAt,
-      });
-    }
+  for (let index = 0; index < PATIENT_COUNT; index += 1) {
+    const doctor = doctors[Math.floor(rand() * doctors.length)] as DoctorSeed;
+    const createdAt = new Date(now - rand() * PATIENT_SPREAD_DAYS * DAY_MS);
+    patients.push({
+      condition: pickWeighted(CONDITIONS, CONDITION_WEIGHTS),
+      createdAt,
+      doctorId: doctor.id,
+      id: new mongoose.Types.ObjectId().toString(),
+      name: `${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`,
+      updatedAt: createdAt,
+    });
   }
   return patients;
 };
 
+const insertChunked = async <T extends object>(
+  model: { insertMany: (docs: T[], options: { timestamps: boolean }) => Promise<unknown> },
+  docs: T[],
+): Promise<void> => {
+  for (let start = 0; start < docs.length; start += INSERT_CHUNK) {
+    await model.insertMany(docs.slice(start, start + INSERT_CHUNK), {
+      timestamps: false,
+    });
+  }
+};
+
 const main = async (): Promise<void> => {
+  const started = Date.now();
   await mongoose.connect(ENV.DATABASE_URL);
   await Promise.all([Doctor.deleteMany({}), Patient.deleteMany({})]);
 
@@ -184,10 +297,12 @@ const main = async (): Promise<void> => {
   const doctors = buildDoctors(now);
   const patients = buildPatients(doctors, now);
 
-  await Doctor.insertMany(doctors, { timestamps: false });
-  await Patient.insertMany(patients, { timestamps: false });
+  await insertChunked(Doctor, doctors);
+  await insertChunked(Patient, patients);
 
-  console.log(`Seed complete: ${doctors.length} doctors, ${patients.length} patients`);
+  console.log(
+    `Seed complete: ${doctors.length} doctors, ${patients.length} patients in ${Date.now() - started}ms`,
+  );
 };
 
 try {
