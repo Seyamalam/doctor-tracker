@@ -177,8 +177,10 @@ const SearchPalette = ({
             </p>
           ) : null}
           {!searching && (
-            <CommandEmpty className="text-muted-foreground px-4 py-10 text-center text-sm">
-              No results for “{debounced}”.
+            <CommandEmpty className="text-muted-foreground text-center text-sm">
+              <span className="block px-4 py-10">
+                No results for “{debounced}”.
+              </span>
             </CommandEmpty>
           )}
           <CommandList className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-2">
