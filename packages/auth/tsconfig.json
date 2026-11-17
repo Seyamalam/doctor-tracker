@@ -1,0 +1,6 @@
+{
+  "extends": "@doctor-tracker/config/tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  }
+}

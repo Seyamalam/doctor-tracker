@@ -1,0 +1,3 @@
+{
+  "extends": "@doctor-tracker/config/tsconfig.base.json"
+}

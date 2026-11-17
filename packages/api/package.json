@@ -1,0 +1,23 @@
+{
+  "name": "@doctor-tracker/api",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@doctor-tracker/auth": "*",
+    "@doctor-tracker/db": "*",
+    "@trpc/client": "^11.28.0",
+    "@trpc/server": "^11.28.0",
+    "mongoose": "^9.12.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@doctor-tracker/config": "*",
+    "typescript": "^6.0.3"
+  }
+}
