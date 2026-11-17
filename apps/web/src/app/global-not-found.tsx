@@ -1,8 +1,6 @@
-import { Button } from "@ui-sdk/react/button";
 import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import Link from "next/link";
 
 import "../index.css";
 import { Logo } from "@/components/logo";
@@ -53,19 +51,25 @@ const GlobalNotFound = () => (
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <Button
-            className={cx(btn.primary, "h-11 gap-2 px-5")}
-            render={<Link href="/dashboard" />}
+          <a
+            className={cx(
+              btn.primary,
+              "inline-flex h-11 items-center gap-2 px-5 no-underline"
+            )}
+            href="/dashboard"
           >
             Go to the console
             <ArrowRight aria-hidden="true" className="h-4 w-4" />
-          </Button>
-          <Button
-            className={cx(btn.ghost, "h-11")}
-            render={<Link href="/login" />}
+          </a>
+          <a
+            className={cx(
+              btn.ghost,
+              "inline-flex h-11 items-center px-5 no-underline"
+            )}
+            href="/login"
           >
             Sign in
-          </Button>
+          </a>
         </div>
       </main>
     </body>
