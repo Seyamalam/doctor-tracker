@@ -4,6 +4,7 @@ import type { NextConfig } from "next";
 const withVarlock = varlockNextConfigPlugin();
 
 const nextConfig: NextConfig = {
+  experimental: { globalNotFound: true },
   reactCompiler: true,
   typedRoutes: true,
 };
