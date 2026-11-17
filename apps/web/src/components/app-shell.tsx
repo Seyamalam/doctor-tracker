@@ -307,12 +307,20 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           className={cx(
             "flex pb-3 pt-5",
             collapsed
-              ? "flex-col items-center gap-3 px-2"
+              ? "flex-col items-center gap-2 px-2"
               : "items-center justify-between pl-4 pr-3"
           )}
         >
           <Brand collapsed={collapsed} />
-          <CollapseButton collapsed={collapsed} onToggle={toggleCollapsed} />
+          <div
+            className={cx(
+              "flex items-center",
+              collapsed ? "flex-col gap-2" : "gap-1"
+            )}
+          >
+            <ModeToggle className={collapsed ? "h-10 w-10" : undefined} />
+            <CollapseButton collapsed={collapsed} onToggle={toggleCollapsed} />
+          </div>
         </div>
         <div className={cx("pb-3", collapsed ? "px-2" : "px-3")}>
           <SidebarSearchButton
@@ -325,14 +333,13 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
         </div>
         <div
           className={cx(
-            "border-border flex items-center border-t",
-            collapsed ? "flex-col gap-2 py-3" : "gap-2 p-3"
+            "border-border flex items-center justify-center border-t",
+            collapsed ? "py-3" : "gap-2 p-3"
           )}
         >
           <div className={collapsed ? undefined : "min-w-0 flex-1"}>
             {collapsed ? <CollapsedUserMenu /> : <UserMenu />}
           </div>
-          <ModeToggle className={collapsed ? "h-10 w-10" : undefined} />
         </div>
       </aside>
 
