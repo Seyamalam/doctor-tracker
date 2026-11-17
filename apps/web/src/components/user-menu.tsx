@@ -1,7 +1,14 @@
 "use client";
 
 import { Button } from "@ui-sdk/react/button";
-import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@ui-sdk/react/menu";
+import {
+  Menu,
+  MenuContent,
+  MenuGroupLabel,
+  MenuItem,
+  MenuSeparator,
+  MenuTrigger,
+} from "@ui-sdk/react/menu";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -48,9 +55,9 @@ const UserMenu = () => {
         side="bottom"
         sideOffset={4}
       >
-        <MenuItem className={cx(menuItemCls, "truncate text-muted-foreground")} value="email">
+        <MenuGroupLabel className="text-muted-foreground truncate px-2.5 py-1.5 text-sm">
           {session.user.email}
-        </MenuItem>
+        </MenuGroupLabel>
         <MenuSeparator className="bg-border my-1 h-px" />
         <MenuItem className={cx(menuItemCls, "text-danger")} value="sign-out">
           <LogOut className="h-3.5 w-3.5" />

@@ -42,14 +42,14 @@ export const DataTable = <TData extends RowData>({
 }: DataTableProps<TData>) => {
   const { rows } = table.getRowModel();
   return (
-    <div className="anim-fade border-border bg-card overflow-x-auto rounded-xl border shadow-sm">
+    <div className="anim-fade border-border bg-card overflow-x-auto overscroll-contain rounded-xl border shadow-sm">
       <table className={cx("w-full border-collapse text-left text-sm", minWidthClass)}>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr className="border-border bg-muted/50 border-b" key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
-                  className="text-muted-foreground h-10 px-3 align-middle text-xs font-medium whitespace-nowrap"
+                  className="text-muted-foreground relative h-10 px-3 align-middle text-xs font-medium whitespace-nowrap"
                   key={header.id}
                   scope="col"
                 >

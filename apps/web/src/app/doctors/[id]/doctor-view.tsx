@@ -222,7 +222,7 @@ export const DoctorView = ({ id }: { id: string }) => {
       <DoctorFormDialog doctor={doctor} onOpenChange={setEditDoctor} open={editDoctor} />
       <ConfirmDialog
         confirmLabel="Delete doctor"
-        description={`This permanently removes Dr. ${doctor.name} and unassigns their patients. This can't be undone.`}
+        description={`This permanently removes ${doctor.name} and unassigns their patients. This can't be undone.`}
         onConfirm={async () => {
           await deleteDoctor.mutateAsync(doctor.id);
           router.replace("/doctors");

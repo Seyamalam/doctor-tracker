@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@ui-sdk/react/select";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { selectContentCls, selectTriggerCls } from "@/components/form-fields";
 import { TablePagination } from "@/components/pagination";
@@ -46,6 +46,7 @@ export const SearchInput = ({ placeholder }: { placeholder: string }) => {
         />
         <Input
           className={cx(inputCls, "pl-9")}
+          enterKeyHint="search"
           id="table-search"
           name="search"
           onValueChange={(next) => {
@@ -66,15 +67,17 @@ const ALL = "all";
 export const FilterSelect = ({
   param,
   label,
+  allLabel,
   items,
 }: {
   param: string;
   label: string;
+  allLabel?: string;
   items: { value: string; label: string }[];
 }) => {
   const { get } = useTableParams();
   const setParams = useSetTableParams();
-  const allItems = [{ label: `All ${label.toLowerCase()}`, value: ALL }, ...items];
+  const allItems = [{ label: allLabel ?? `All ${label.toLowerCase()}s`, value: ALL }, ...items];
   return (
     <div className="flex flex-col gap-1">
       <span className={labelCls}>{label}</span>
@@ -92,7 +95,9 @@ export const FilterSelect = ({
         <SelectContent className={selectContentCls} side="bottom" sideOffset={4}>
           {allItems.map((item) => (
             <SelectItem className={selectItemCls} key={item.value} value={item.value}>
-              {item.label}
+              <span className="min-w-0 truncate" title={item.label}>
+                {item.label}
+              </span>
               <SelectItemIndicator className="text-primary" />
             </SelectItem>
           ))}
@@ -120,7 +125,9 @@ export const SortSelect = ({ items }: { items: { value: string; label: string }[
         <SelectContent className={selectContentCls} side="bottom" sideOffset={4}>
           {allItems.map((item) => (
             <SelectItem className={selectItemCls} key={item.value} value={item.value}>
-              {item.label}
+              <span className="min-w-0 truncate" title={item.label}>
+                {item.label}
+              </span>
               <SelectItemIndicator className="text-primary" />
             </SelectItem>
           ))}
@@ -185,11 +192,19 @@ export const TableFooter = ({
   totalPages: number;
 }) => {
   const setParams = useSetTableParams();
+  const outOfRange = totalPages > 0 && page > totalPages;
+
+  useEffect(() => {
+    if (outOfRange) {
+      setParams({ page: totalPages });
+    }
+  }, [outOfRange, totalPages, setParams]);
+
   if (total === 0) {
     return null;
   }
-  const start = (page - 1) * limit + 1;
-  const end = Math.min(page * limit, total);
+  const start = outOfRange ? 0 : (page - 1) * limit + 1;
+  const end = outOfRange ? 0 : Math.min(page * limit, total);
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <p className="text-muted-foreground text-[13px]">
@@ -199,7 +214,7 @@ export const TableFooter = ({
       </p>
       <TablePagination
         onPageChange={(next) => setParams({ page: next })}
-        page={page}
+        page={outOfRange ? totalPages : page}
         pageCount={totalPages}
       />
     </div>

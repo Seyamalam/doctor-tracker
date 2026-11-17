@@ -3,6 +3,7 @@
 @import "@ui-sdk/core/web.css" layer(components);
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant coarse (@media (pointer: coarse));
 
 @theme inline {
   --color-background: var(--background);

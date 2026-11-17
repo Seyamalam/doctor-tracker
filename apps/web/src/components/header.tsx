@@ -25,10 +25,10 @@ const Header = () => {
 
   return (
     <header className="border-border bg-card border-b">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
         <div className="flex min-w-0 items-center gap-6">
           <Link
-            className="flex shrink-0 items-center gap-2 transition-opacity hover:opacity-80"
+            className="flex shrink-0 items-center gap-2 rounded-md transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             href="/dashboard"
           >
             <Logo className="h-6 w-6" />
@@ -39,7 +39,7 @@ const Header = () => {
               <Link
                 aria-current={isActive(to) ? "page" : undefined}
                 className={cx(
-                  "rounded-md px-3 py-1.5 font-medium text-[13px] transition-colors motion-reduce:transition-none",
+                  "rounded-md px-3 py-1.5 font-medium text-[13px] transition-colors motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                   isActive(to)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",

@@ -35,7 +35,19 @@ export const useDoctor = (id: string) =>
 
 export const useDoctorOptions = () =>
   useQuery({
-    queryFn: () => api.doctors.list({ limit: 50, page: 1 }),
+    // The API clamps limit at 50; page through so no doctor is missing from selects.
+    queryFn: async () => {
+      const first = await api.doctors.list({ limit: 50, page: 1 });
+      if (first.data.length >= first.total) {
+        return first;
+      }
+      const rest = await Promise.all(
+        Array.from({ length: first.totalPages - 1 }, (_, i) =>
+          api.doctors.list({ limit: 50, page: i + 2 }),
+        ),
+      );
+      return { ...first, data: [...first.data, ...rest.flatMap((page) => page.data)] };
+    },
     queryKey: ["doctors", "options"],
     select: (result) => result.data,
     staleTime: 60_000,

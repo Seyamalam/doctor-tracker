@@ -21,10 +21,21 @@ interface PatientColumnsOptions {
 export const patientColumns = ({ showDoctor = true, onEdit, onDelete }: PatientColumnsOptions) =>
   helper.columns([
     helper.accessor("name", {
-      cell: (ctx) => <span className="font-medium">{ctx.getValue()}</span>,
+      cell: (ctx) => (
+        <span className="block max-w-44 truncate font-medium" title={ctx.getValue()}>
+          {ctx.getValue()}
+        </span>
+      ),
       header: "Name",
     }),
-    helper.accessor("condition", { header: "Condition" }),
+    helper.accessor("condition", {
+      cell: (ctx) => (
+        <span className="block max-w-52 truncate" title={ctx.getValue()}>
+          {ctx.getValue()}
+        </span>
+      ),
+      header: "Condition",
+    }),
     ...(showDoctor
       ? [
           helper.accessor((row) => row.doctor?.name ?? "", {
@@ -32,8 +43,9 @@ export const patientColumns = ({ showDoctor = true, onEdit, onDelete }: PatientC
               const { doctor } = ctx.row.original;
               return doctor ? (
                 <Link
-                  className="text-primary hover:underline"
+                  className="text-primary block max-w-44 truncate hover:underline"
                   href={`/doctors/${doctor.id}` as Route}
+                  title={doctor.name}
                 >
                   {doctor.name}
                 </Link>

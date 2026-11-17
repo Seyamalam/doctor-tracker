@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "../index.css";
@@ -23,6 +23,16 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+  interactiveWidget: "resizes-content",
+  themeColor: [
+    { color: "#ffffff", media: "(prefers-color-scheme: light)" },
+    { color: "#141416", media: "(prefers-color-scheme: dark)" },
+  ],
+  viewportFit: "cover",
+};
+
 const RootLayout = ({
   children,
 }: Readonly<{
@@ -31,7 +41,7 @@ const RootLayout = ({
   <html lang="en" suppressHydrationWarning>
     <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
       <Providers>
-        <div className="grid min-h-dvh grid-rows-[auto_1fr]">
+        <div className="grid min-h-dvh grid-cols-1 grid-rows-[auto_1fr]">
           <Header />
           {children}
         </div>

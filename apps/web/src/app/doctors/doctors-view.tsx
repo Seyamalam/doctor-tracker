@@ -161,7 +161,7 @@ export const DoctorsView = () => {
       />
       <ConfirmDialog
         confirmLabel="Delete doctor"
-        description={`This permanently removes Dr. ${deleteTarget?.name ?? ""} and unassigns their patients. This can't be undone.`}
+        description={`This permanently removes ${deleteTarget?.name ?? ""} and unassigns their patients. This can't be undone.`}
         onConfirm={async () => {
           if (deleteTarget) {
             await deleteDoctor.mutateAsync(deleteTarget.id);

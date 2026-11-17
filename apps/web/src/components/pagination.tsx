@@ -14,7 +14,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cx } from "@/components/ui";
 
 const pageBtn =
-  "inline-flex h-8 min-w-8 select-none items-center justify-center rounded-md px-2 font-medium text-[13px] text-foreground transition-[background-color,color] duration-100 data-current:bg-primary data-current:text-primary-foreground data-disabled:opacity-40 hover:bg-muted data-current:hover:bg-primary/90 motion-reduce:transition-none";
+  "inline-flex h-8 min-w-8 select-none items-center justify-center rounded-md px-2 font-medium text-[13px] text-foreground transition-[background-color,color] duration-100 data-current:bg-primary data-current:text-primary-foreground data-disabled:opacity-40 hover:bg-muted data-current:hover:bg-primary/90 motion-reduce:transition-none coarse:h-10 coarse:min-w-10";
 
 interface TablePaginationProps {
   page: number;

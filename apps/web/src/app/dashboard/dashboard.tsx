@@ -112,6 +112,14 @@ const Dashboard = ({ name }: { name: string }) => {
   const { totals, patientsPerDoctor, patientsByCondition, patientsPerDay, recentPatients } =
     stats.data;
 
+  const MAX_PIE_SLICES = 5;
+  const topConditions = patientsByCondition.slice(0, MAX_PIE_SLICES);
+  const otherCount = patientsByCondition
+    .slice(MAX_PIE_SLICES)
+    .reduce((sum, entry) => sum + entry.count, 0);
+  const pieData =
+    otherCount > 0 ? [...topConditions, { condition: "Other", count: otherCount }] : topConditions;
+
   const avgPerDoctor = totals.doctors > 0 ? (totals.patients / totals.doctors).toFixed(1) : "0";
   const newLastWeek = patientsPerDay.slice(-7).reduce((sum, day) => sum + day.count, 0);
   const topDoctors = patientsPerDoctor.slice(0, 8);
@@ -182,7 +190,7 @@ const Dashboard = ({ name }: { name: string }) => {
             <ResponsiveContainer height="100%" width="100%">
               <PieChart>
                 <Pie
-                  data={patientsByCondition}
+                  data={pieData}
                   dataKey="count"
                   innerRadius={54}
                   nameKey="condition"
@@ -190,7 +198,7 @@ const Dashboard = ({ name }: { name: string }) => {
                   paddingAngle={2}
                   stroke="none"
                 >
-                  {patientsByCondition.map((entry, index) => (
+                  {pieData.map((entry, index) => (
                     <Cell fill={PIE_COLORS[index % PIE_COLORS.length]} key={entry.condition} />
                   ))}
                 </Pie>

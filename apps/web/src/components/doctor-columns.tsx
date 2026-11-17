@@ -22,22 +22,41 @@ export const doctorColumns = ({ onEdit, onDelete }: DoctorColumnsOptions) =>
     helper.accessor("name", {
       cell: (ctx) => (
         <Link
-          className="text-primary font-medium hover:underline"
+          className="text-primary block max-w-40 truncate font-medium hover:underline"
           href={`/doctors/${ctx.row.original.id}` as Route}
+          title={ctx.getValue()}
         >
           {ctx.getValue()}
         </Link>
       ),
       header: "Name",
     }),
-    helper.accessor("specialization", { header: "Specialization" }),
-    helper.accessor("hospital", { header: "Hospital" }),
+    helper.accessor("specialization", {
+      cell: (ctx) => (
+        <span className="block max-w-36 truncate" title={ctx.getValue()}>
+          {ctx.getValue()}
+        </span>
+      ),
+      header: "Specialization",
+    }),
+    helper.accessor("hospital", {
+      cell: (ctx) => (
+        <span className="block max-w-40 truncate" title={ctx.getValue()}>
+          {ctx.getValue()}
+        </span>
+      ),
+      header: "Hospital",
+    }),
     helper.accessor("phone", {
       cell: (ctx) => <span className="text-muted-foreground">{ctx.getValue()}</span>,
       header: "Phone",
     }),
     helper.accessor("email", {
-      cell: (ctx) => <span className="text-muted-foreground">{ctx.getValue()}</span>,
+      cell: (ctx) => (
+        <span className="text-muted-foreground block max-w-40 truncate" title={ctx.getValue()}>
+          {ctx.getValue()}
+        </span>
+      ),
       header: "Email",
     }),
     helper.accessor("patientCount", {

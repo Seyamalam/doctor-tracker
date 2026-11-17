@@ -30,12 +30,12 @@ export interface FieldLike {
 }
 
 export const selectTriggerCls =
-  "flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-input bg-card px-3 text-left text-sm transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring disabled:opacity-50";
+  "flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-input bg-card px-3 text-left text-sm transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring disabled:opacity-50 coarse:h-10";
 
 export const selectContentCls = cx(
   popupCls,
   popupAnimCls,
-  "max-h-72 min-w-(--anchor-width) overflow-y-auto p-1",
+  "max-h-72 min-w-(--anchor-width) max-w-[min(26rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain p-1",
 );
 
 export const TextField = ({
@@ -93,7 +93,9 @@ export const SelectField = ({
       <SelectContent className={selectContentCls} side="bottom" sideOffset={4}>
         {items.map((item) => (
           <SelectItem className={selectItemCls} key={item.value} value={item.value}>
-            {item.label}
+            <span className="min-w-0 truncate" title={item.label}>
+              {item.label}
+            </span>
             <SelectItemIndicator className="text-primary" />
           </SelectItem>
         ))}

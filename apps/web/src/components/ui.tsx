@@ -7,16 +7,16 @@ const btnBase =
   "inline-flex select-none items-center justify-center gap-2 rounded-lg font-medium transition-[background-color,color,transform,opacity] duration-100 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none motion-reduce:active:scale-100";
 
 export const btn = {
-  danger: `${btnBase} h-9 bg-danger px-4 text-danger-foreground text-sm hover:bg-danger/90`,
-  dangerGhost: `${btnBase} h-9 px-3 text-danger text-sm hover:bg-danger/10`,
-  ghost: `${btnBase} h-9 px-3 text-foreground text-sm hover:bg-muted`,
-  icon: `${btnBase} h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground`,
-  outline: `${btnBase} h-9 border border-border bg-card px-4 text-foreground text-sm hover:bg-muted`,
-  primary: `${btnBase} h-9 bg-primary px-4 text-primary-foreground text-sm hover:bg-primary/90`,
+  danger: `${btnBase} h-9 bg-danger px-4 text-danger-foreground text-sm hover:bg-danger/90 coarse:h-10`,
+  dangerGhost: `${btnBase} h-9 px-3 text-danger text-sm hover:bg-danger/10 coarse:h-10`,
+  ghost: `${btnBase} h-9 px-3 text-foreground text-sm hover:bg-muted coarse:h-10`,
+  icon: `${btnBase} h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground coarse:h-10 coarse:w-10`,
+  outline: `${btnBase} h-9 border border-border bg-card px-4 text-foreground text-sm hover:bg-muted coarse:h-10`,
+  primary: `${btnBase} h-9 bg-primary px-4 text-primary-foreground text-sm hover:bg-primary/90 coarse:h-10`,
 };
 
 export const inputCls =
-  "h-9 w-full rounded-lg border border-input bg-card px-3 text-foreground text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring disabled:opacity-50";
+  "h-9 w-full rounded-lg border border-input bg-card px-3 text-foreground text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring disabled:opacity-50 coarse:h-10";
 
 export const labelCls = "font-medium text-[13px] text-foreground";
 
@@ -24,13 +24,13 @@ export const popupCls =
   "z-50 rounded-lg border border-border bg-card text-card-foreground shadow-lg";
 
 export const popupAnimCls =
-  "origin-(--transform-origin) transition-[opacity,scale] duration-150 ease-out data-ending-style:scale-95 data-starting-style:scale-95 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none";
+  "origin-(--transform-origin) transition-[opacity,scale] duration-150 ease-out data-ending-style:scale-95 data-starting-style:scale-95 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-opacity";
 
 export const menuItemCls =
-  "flex cursor-pointer select-none items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:bg-muted data-highlighted:text-foreground";
+  "flex cursor-pointer select-none items-center gap-2 rounded-md px-2.5 py-1.5 text-sm outline-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:bg-muted data-highlighted:text-foreground coarse:py-2.5";
 
 export const selectItemCls =
-  "flex cursor-pointer select-none items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-sm outline-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:bg-muted";
+  "flex cursor-pointer select-none items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-sm outline-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:bg-muted coarse:py-2.5";
 
 export const PageHeader = ({
   title,
