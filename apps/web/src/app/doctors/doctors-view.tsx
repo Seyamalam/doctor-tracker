@@ -19,6 +19,7 @@ import {
 import { btn, cx, PageHeader, Skeleton } from "@/components/ui";
 import type { Doctor, DoctorsParams } from "@/lib/api";
 import { useDeleteDoctor, useDoctors, useSpecializations } from "@/lib/hooks/use-doctors";
+import { useIsAdmin } from "@/lib/hooks/use-role";
 import { useSetTableParams, useTableParams } from "@/lib/search-params";
 
 const EMPTY: Doctor[] = [];
@@ -55,6 +56,7 @@ export const DoctorsView = () => {
   const query = useDoctors(listParams);
   const specializations = useSpecializations();
   const deleteDoctor = useDeleteDoctor();
+  const isAdmin = useIsAdmin();
 
   const [formTarget, setFormTarget] = useState<Doctor | "new" | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Doctor | null>(null);
@@ -62,10 +64,11 @@ export const DoctorsView = () => {
   const columns = useMemo(
     () =>
       doctorColumns({
+        canMutate: isAdmin,
         onDelete: setDeleteTarget,
         onEdit: setFormTarget,
       }),
-    [],
+    [isAdmin],
   );
   const table = useTable({
     columns,
@@ -87,10 +90,12 @@ export const DoctorsView = () => {
   return (
     <main className="anim-enter mx-auto w-full max-w-6xl px-4 py-6">
       <PageHeader description="Manage your doctor directory" title="Doctors">
-        <button className={btn.primary} onClick={() => setFormTarget("new")} type="button">
-          <Plus className="h-4 w-4" />
-          New doctor
-        </button>
+        {isAdmin ? (
+          <button className={btn.primary} onClick={() => setFormTarget("new")} type="button">
+            <Plus className="h-4 w-4" />
+            New doctor
+          </button>
+        ) : null}
       </PageHeader>
 
       <div className="mt-5 flex flex-wrap items-end gap-3">
@@ -121,12 +126,12 @@ export const DoctorsView = () => {
               <button className={btn.outline} onClick={clearFilters} type="button">
                 Clear filters
               </button>
-            ) : (
+            ) : isAdmin ? (
               <button className={btn.primary} onClick={() => setFormTarget("new")} type="button">
                 <Plus className="h-4 w-4" />
                 Add doctor
               </button>
-            ),
+            ) : null,
             description: hasFilters
               ? "Try different search terms or filters."
               : "Add your first doctor to start building the directory.",

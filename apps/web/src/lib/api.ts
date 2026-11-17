@@ -134,6 +134,7 @@ export interface DoctorPatientsParams {
   condition?: string;
   from?: string;
   to?: string;
+  sort?: string;
   page?: number;
   limit?: number;
 }

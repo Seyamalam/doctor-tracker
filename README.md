@@ -20,7 +20,7 @@ A secure admin app for managing doctors and their patients. Sign in with email/p
 
 ## Features
 
-- **Session auth** — better-auth email/password; httpOnly cookies; every `/api/*` route except `/api/health` requires a session, and all app pages gate server-side before render.
+- **Session auth + roles** — better-auth email/password; httpOnly cookies; every `/api/*` route except `/api/health` requires a session, and all app pages gate server-side before render. Two roles: **admin** (full CRUD) and **viewer** (read-only — mutations return 403 and the UI hides them). Demo accounts after `npm run seed:users -w server`: `admin@doctor-tracker.dev` / `Admin1234!` and `viewer@doctor-tracker.dev` / `Viewer1234!`.
 - **Doctors** — list with search (name/specialization/hospital/email), specialization filter, `createdAt` date range, column sort, pagination; create/edit/delete dialogs; deleting a doctor cascades to their patients.
 - **Doctor detail** — doctor card plus their patient roster with the same filter/search/pagination controls.
 - **Patients** — list with search (name/condition), condition and doctor filters, sort, pagination; each row embeds its doctor and links to the detail page; create/edit/delete with doctor reassignment.
@@ -105,6 +105,7 @@ cp apps/web/.env.example apps/web/.env
 
 ```bash
 npm run seed -w @doctor-tracker/db   # 15 doctors, 60 patients into Atlas
+npm run seed:users -w server         # demo admin + viewer accounts
 npm run dev                          # web :3001 + server :3000
 ```
 

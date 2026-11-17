@@ -13,11 +13,12 @@ const helper = createColumnHelper<typeof features, Doctor>();
 export { features };
 
 interface DoctorColumnsOptions {
+  canMutate?: boolean;
   onEdit: (doctor: Doctor) => void;
   onDelete: (doctor: Doctor) => void;
 }
 
-export const doctorColumns = ({ onEdit, onDelete }: DoctorColumnsOptions) =>
+export const doctorColumns = ({ canMutate = true, onEdit, onDelete }: DoctorColumnsOptions) =>
   helper.columns([
     helper.accessor("name", {
       cell: (ctx) => (
@@ -67,14 +68,18 @@ export const doctorColumns = ({ onEdit, onDelete }: DoctorColumnsOptions) =>
       cell: (ctx) => <span className="text-muted-foreground">{formatDate(ctx.getValue())}</span>,
       header: "Added",
     }),
-    helper.display({
-      cell: (ctx) => (
-        <RowActionsMenu
-          onDelete={() => onDelete(ctx.row.original)}
-          onEdit={() => onEdit(ctx.row.original)}
-        />
-      ),
-      header: () => <span className="sr-only">Actions</span>,
-      id: "actions",
-    }),
+    ...(canMutate
+      ? [
+          helper.display({
+            cell: (ctx) => (
+              <RowActionsMenu
+                onDelete={() => onDelete(ctx.row.original)}
+                onEdit={() => onEdit(ctx.row.original)}
+              />
+            ),
+            header: () => <span className="sr-only">Actions</span>,
+            id: "actions",
+          }),
+        ]
+      : []),
   ]);

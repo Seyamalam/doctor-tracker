@@ -15,6 +15,7 @@ import {
   DateRangeFilters,
   FilterSelect,
   SearchInput,
+  SortSelect,
   TableFooter,
 } from "@/components/table-toolbar";
 import { btn, Card, cx, EmptyState, Skeleton } from "@/components/ui";
@@ -22,9 +23,17 @@ import type { DoctorPatientsParams, Patient } from "@/lib/api";
 import { formatDate } from "@/lib/format";
 import { useDeleteDoctor, useDoctor, useDoctorPatients } from "@/lib/hooks/use-doctors";
 import { useConditions, useDeletePatient } from "@/lib/hooks/use-patients";
+import { useIsAdmin } from "@/lib/hooks/use-role";
 import { useTableParams } from "@/lib/search-params";
 
 const EMPTY: Patient[] = [];
+
+const PATIENT_SORT_ITEMS = [
+  { label: "Name A–Z", value: "name:asc" },
+  { label: "Name Z–A", value: "name:desc" },
+  { label: "Condition A–Z", value: "condition:asc" },
+  { label: "Oldest first", value: "createdAt:asc" },
+];
 
 export const DoctorViewSkeleton = () => (
   <main aria-busy="true" className="anim-fade mx-auto w-full max-w-6xl px-4 py-6">
@@ -51,6 +60,7 @@ export const DoctorView = ({ id }: { id: string }) => {
   const deletePatient = useDeletePatient();
   const params = useTableParams();
   const conditions = useConditions();
+  const isAdmin = useIsAdmin();
 
   const condition = params.get("condition");
   const listParams: DoctorPatientsParams = {
@@ -59,6 +69,7 @@ export const DoctorView = ({ id }: { id: string }) => {
     limit: params.limit,
     page: params.page,
     search: params.search,
+    sort: params.sort,
     to: params.to,
   };
   const patientsQuery = useDoctorPatients(id, listParams);
@@ -71,11 +82,12 @@ export const DoctorView = ({ id }: { id: string }) => {
   const columns = useMemo(
     () =>
       patientColumns({
+        canMutate: isAdmin,
         onDelete: setDeletePatientTarget,
         onEdit: setPatientForm,
         showDoctor: false,
       }),
-    [],
+    [isAdmin],
   );
   const table = useTable({
     columns,
@@ -145,29 +157,33 @@ export const DoctorView = ({ id }: { id: string }) => {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button className={btn.outline} onClick={() => setEditDoctor(true)} type="button">
-              <Pencil className="h-3.5 w-3.5" />
-              Edit
-            </button>
-            <button
-              className={btn.dangerGhost}
-              onClick={() => setDeleteDoctorOpen(true)}
-              type="button"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-              Delete
-            </button>
-          </div>
+          {isAdmin ? (
+            <div className="flex items-center gap-2">
+              <button className={btn.outline} onClick={() => setEditDoctor(true)} type="button">
+                <Pencil className="h-3.5 w-3.5" />
+                Edit
+              </button>
+              <button
+                className={btn.dangerGhost}
+                onClick={() => setDeleteDoctorOpen(true)}
+                type="button"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Delete
+              </button>
+            </div>
+          ) : null}
         </div>
       </Card>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-base font-semibold">Patients</h2>
-        <button className={btn.primary} onClick={() => setPatientForm("new")} type="button">
-          <Plus className="h-4 w-4" />
-          Add patient
-        </button>
+        {isAdmin ? (
+          <button className={btn.primary} onClick={() => setPatientForm("new")} type="button">
+            <Plus className="h-4 w-4" />
+            Add patient
+          </button>
+        ) : null}
       </div>
 
       <div className="mt-3 flex flex-wrap items-end gap-3">
@@ -177,6 +193,7 @@ export const DoctorView = ({ id }: { id: string }) => {
           label="Condition"
           param="condition"
         />
+        <SortSelect items={PATIENT_SORT_ITEMS} />
         <DateRangeFilters />
       </div>
 
@@ -189,12 +206,12 @@ export const DoctorView = ({ id }: { id: string }) => {
         <DataTable
           columnCount={columns.length}
           empty={{
-            action: (
+            action: isAdmin ? (
               <button className={btn.primary} onClick={() => setPatientForm("new")} type="button">
                 <Plus className="h-4 w-4" />
                 Add patient
               </button>
-            ),
+            ) : null,
             description: hasFilters
               ? "Try different search terms or filters."
               : `${doctor.name} has no patients yet.`,

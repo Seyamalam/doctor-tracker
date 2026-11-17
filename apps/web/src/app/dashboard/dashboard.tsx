@@ -10,6 +10,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  Legend,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -23,6 +24,7 @@ import { formatDate, formatDayLabel } from "@/lib/format";
 import { useStats } from "@/lib/hooks/use-stats";
 
 const TEAL = "#14b8a6";
+const SLATE = "#64748b";
 const PIE_COLORS = ["#0d9488", "#0891b2", "#10b981", "#0ea5e9", "#64748b", "#94a3b8"];
 
 const StatCard = ({
@@ -50,20 +52,24 @@ const StatCard = ({
 
 const ChartTooltip = ({
   active,
+  label,
   payload,
 }: {
   active?: boolean;
+  label?: string;
   payload?: { name?: string; value?: number }[];
 }) => {
   if (!(active && payload?.length)) {
     return null;
   }
-  const [item] = payload;
   return (
     <div className="border-border bg-card rounded-lg border px-3 py-2 text-xs shadow-md">
-      <p className="text-foreground font-medium">
-        {item.name}: <span className="text-primary">{item.value}</span>
-      </p>
+      {label ? <p className="text-muted-foreground mb-1">{label}</p> : null}
+      {payload.map((item) => (
+        <p className="text-foreground font-medium" key={item.name}>
+          {item.name}: <span className="text-primary">{item.value}</span>
+        </p>
+      ))}
     </div>
   );
 };
@@ -109,8 +115,14 @@ const Dashboard = ({ name }: { name: string }) => {
     );
   }
 
-  const { totals, patientsPerDoctor, patientsByCondition, patientsPerDay, recentPatients } =
-    stats.data;
+  const {
+    totals,
+    patientsPerDoctor,
+    patientsByCondition,
+    patientsPerDay,
+    doctorsPerDay,
+    recentPatients,
+  } = stats.data;
 
   const MAX_PIE_SLICES = 5;
   const topConditions = patientsByCondition.slice(0, MAX_PIE_SLICES);
@@ -123,6 +135,12 @@ const Dashboard = ({ name }: { name: string }) => {
   const avgPerDoctor = totals.doctors > 0 ? (totals.patients / totals.doctors).toFixed(1) : "0";
   const newLastWeek = patientsPerDay.slice(-7).reduce((sum, day) => sum + day.count, 0);
   const topDoctors = patientsPerDoctor.slice(0, 8);
+  const doctorCountByDay = new Map(doctorsPerDay.map((day) => [day.date, day.count]));
+  const activity = patientsPerDay.slice(-30).map((day) => ({
+    date: day.date,
+    doctors: doctorCountByDay.get(day.date) ?? 0,
+    patients: day.count,
+  }));
 
   return (
     <main className="anim-enter mx-auto w-full max-w-6xl px-4 py-6">
@@ -156,26 +174,39 @@ const Dashboard = ({ name }: { name: string }) => {
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <h2 className="text-muted-foreground text-[13px] font-medium">
-            New patients — last 30 days
+            New activity — last 30 days
           </h2>
           <div className="mt-3 h-64">
             <ResponsiveContainer height="100%" width="100%">
-              <AreaChart data={patientsPerDay.slice(-30)} margin={{ left: -22, right: 8, top: 8 }}>
+              <AreaChart data={activity} margin={{ left: -22, right: 8, top: 8 }}>
                 <defs>
                   <linearGradient id="patientsGradient" x1="0" x2="0" y1="0" y2="1">
                     <stop offset="0%" stopColor={TEAL} stopOpacity={0.32} />
                     <stop offset="100%" stopColor={TEAL} stopOpacity={0.02} />
+                  </linearGradient>
+                  <linearGradient id="doctorsGradient" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor={SLATE} stopOpacity={0.22} />
+                    <stop offset="100%" stopColor={SLATE} stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="date" tickFormatter={formatDayLabel} tickLine={false} />
                 <YAxis allowDecimals={false} tickLine={false} width={40} />
                 <Tooltip content={<ChartTooltip />} />
+                <Legend iconSize={10} />
                 <Area
-                  dataKey="count"
+                  dataKey="patients"
                   fill="url(#patientsGradient)"
                   name="Patients"
                   stroke={TEAL}
+                  strokeWidth={2}
+                  type="monotone"
+                />
+                <Area
+                  dataKey="doctors"
+                  fill="url(#doctorsGradient)"
+                  name="Doctors"
+                  stroke={SLATE}
                   strokeWidth={2}
                   type="monotone"
                 />
@@ -186,15 +217,15 @@ const Dashboard = ({ name }: { name: string }) => {
 
         <Card>
           <h2 className="text-muted-foreground text-[13px] font-medium">Patients by condition</h2>
-          <div className="mt-3 h-64">
+          <div className="mt-3 h-48">
             <ResponsiveContainer height="100%" width="100%">
               <PieChart>
                 <Pie
                   data={pieData}
                   dataKey="count"
-                  innerRadius={54}
+                  innerRadius={42}
                   nameKey="condition"
-                  outerRadius={84}
+                  outerRadius={66}
                   paddingAngle={2}
                   stroke="none"
                 >
@@ -206,6 +237,23 @@ const Dashboard = ({ name }: { name: string }) => {
               </PieChart>
             </ResponsiveContainer>
           </div>
+          <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5">
+            {pieData.map((entry, index) => (
+              <li className="flex items-center gap-2 text-xs" key={entry.condition}>
+                <span
+                  aria-hidden="true"
+                  className="h-2.5 w-2.5 shrink-0 rounded-sm"
+                  style={{ backgroundColor: PIE_COLORS[index % PIE_COLORS.length] }}
+                />
+                <span className="text-muted-foreground min-w-0 truncate" title={entry.condition}>
+                  {entry.condition}
+                </span>
+                <span className="text-foreground ml-auto font-medium tabular-nums">
+                  {entry.count}
+                </span>
+              </li>
+            ))}
+          </ul>
         </Card>
       </div>
 
@@ -218,6 +266,7 @@ const Dashboard = ({ name }: { name: string }) => {
                 <XAxis allowDecimals={false} tickLine={false} type="number" />
                 <YAxis dataKey="name" tickLine={false} type="category" width={96} />
                 <Tooltip content={<ChartTooltip />} cursor={false} />
+                <Legend iconSize={10} />
                 <Bar dataKey="count" fill={TEAL} name="Patients" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
