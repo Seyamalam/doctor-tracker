@@ -106,6 +106,18 @@ describe("GET /api/doctors", () => {
     expect(res.status).toBe(400);
   });
 
+  it("clamps out-of-range pages to the last real page", async () => {
+    const docs = Array.from({ length: 12 }, (_, i) => makeDoctor(i));
+    await seedDoctors(docs);
+
+    const res = await request(authedApp()).get("/api/doctors?limit=10&page=9999");
+    expect(res.status).toBe(200);
+    expect(res.body.page).toBe(2);
+    expect(res.body.totalPages).toBe(2);
+    expect(res.body.total).toBe(12);
+    expect(res.body.data).toHaveLength(2);
+  });
+
   it("searches case-insensitively across fields", async () => {
     await seedDoctors([
       makeDoctor(0, { name: "Dr. Heart", specialization: "Cardiology" }),
@@ -238,6 +250,31 @@ describe("GET /api/doctors/:id/patients", () => {
       `/api/doctors/${doc.id}/patients?condition=Asthma`,
     );
     expect(filtered.body.total).toBe(1);
+  });
+
+  it("sorts scoped patients and clamps out-of-range pages", async () => {
+    const doc = await seedDoctor(0);
+    await seedPatients([
+      makePatient(0, doc.id, { name: "Zulu" }),
+      makePatient(1, doc.id, { name: "Able" }),
+      makePatient(2, doc.id, { name: "Mike" }),
+    ]);
+
+    const sorted = await request(authedApp()).get(`/api/doctors/${doc.id}/patients?sort=name:asc`);
+    expect(sorted.status).toBe(200);
+    expect(sorted.body.data.map((p: { name: string }) => p.name)).toEqual(["Able", "Mike", "Zulu"]);
+
+    const bad = await request(authedApp()).get(
+      `/api/doctors/${doc.id}/patients?sort=doctorId:desc`,
+    );
+    expect(bad.status).toBe(400);
+
+    const clamped = await request(authedApp()).get(
+      `/api/doctors/${doc.id}/patients?limit=2&page=99`,
+    );
+    expect(clamped.status).toBe(200);
+    expect(clamped.body.page).toBe(2);
+    expect(clamped.body.data).toHaveLength(1);
   });
 
   it("404s when the doctor does not exist", async () => {

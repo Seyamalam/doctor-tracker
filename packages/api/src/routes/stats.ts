@@ -55,15 +55,18 @@ statsRouter.get(
           {
             $lookup: {
               as: "patients",
-              foreignField: "doctorId",
               from: "patient",
-              localField: "id",
+              let: { doctorId: "$id" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$doctorId", "$$doctorId"] } } },
+                { $count: "count" },
+              ],
             },
           },
           {
             $project: {
               _id: 0,
-              count: { $size: "$patients" },
+              count: { $ifNull: [{ $first: "$patients.count" }, 0] },
               doctorId: "$id",
               name: 1,
               specialization: 1,

@@ -8,6 +8,8 @@ import { auth } from "./services";
 
 const app = express();
 
+app.disable("x-powered-by");
+
 app.use(
   cors({
     allowedHeaders: ["Content-Type", "Authorization"],

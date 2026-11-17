@@ -9,11 +9,12 @@ import {
   escapeRegex,
   listQueryFields,
   optionalFilter,
+  paginate,
   parseSort,
   sendValidationError,
   sortParam,
-  toPaginated,
 } from "../lib/listing";
+import { requireAdmin } from "../middleware/require-role";
 import type { EmbeddedDoctor, PatientWithDoctor } from "../lib/patient-projection";
 import { doctorEmbedStages } from "../lib/patient-projection";
 
@@ -95,22 +96,15 @@ patientsRouter.get(
       match.createdAt = range;
     }
 
-    const [result] = await Patient.aggregate<{
-      data: PatientWithDoctor[];
-      total: { count: number }[];
-    }>([
-      { $match: match },
-      { $sort: parseSort(sort) },
-      {
-        $facet: {
-          data: [{ $skip: (page - 1) * limit }, { $limit: limit }, ...doctorEmbedStages],
-          total: [{ $count: "count" }],
-        },
-      },
-    ]);
+    const result = await paginate<PatientWithDoctor>({
+      dataStages: doctorEmbedStages,
+      limit,
+      model: Patient,
+      page,
+      stages: [{ $match: match }, { $sort: parseSort(sort) }],
+    });
 
-    const total = result?.total[0]?.count ?? 0;
-    res.json(toPaginated(result?.data ?? [], total, page, limit));
+    res.json(result);
   }),
 );
 
@@ -128,6 +122,7 @@ patientsRouter.get(
 
 patientsRouter.post(
   "/",
+  requireAdmin,
   asyncHandler(async (req, res) => {
     const parsed = createPatientSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -167,6 +162,7 @@ patientsRouter.get(
 
 patientsRouter.patch(
   "/:id",
+  requireAdmin,
   asyncHandler(async (req, res) => {
     const params = idParamsSchema.safeParse(req.params);
     if (!params.success) {
@@ -204,6 +200,7 @@ patientsRouter.patch(
 
 patientsRouter.delete(
   "/:id",
+  requireAdmin,
   asyncHandler(async (req, res) => {
     const params = idParamsSchema.safeParse(req.params);
     if (!params.success) {

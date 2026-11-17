@@ -1,4 +1,5 @@
 import type { Response } from "express";
+import type { PipelineStage } from "mongoose";
 import { z } from "zod";
 
 const DEFAULT_LIMIT = 10;
@@ -60,6 +61,46 @@ export const toPaginated = <T>(
   total,
   totalPages: Math.ceil(total / limit),
 });
+
+export interface FacetResult<T> {
+  data: T[];
+  total: { count: number }[];
+}
+
+export interface AggregationModel {
+  aggregate<R>(pipeline: PipelineStage[]): PromiseLike<R[]>;
+}
+
+// Runs match+sort stages once, then pages via $facet. Out-of-range pages are
+// re-queried at the last real page and returned with the corrected page number.
+export const paginate = async <T>(options: {
+  dataStages: PipelineStage.FacetPipelineStage[];
+  limit: number;
+  model: AggregationModel;
+  page: number;
+  stages: PipelineStage[];
+}): Promise<Paginated<T>> => {
+  const { dataStages, limit, model, page, stages } = options;
+  const run = (skip: number) =>
+    model.aggregate<FacetResult<T>>([
+      ...stages,
+      {
+        $facet: {
+          data: [{ $skip: skip }, { $limit: limit }, ...dataStages],
+          total: [{ $count: "count" }],
+        },
+      },
+    ]);
+  let [result] = await run((page - 1) * limit);
+  const total = result?.total[0]?.count ?? 0;
+  const effectivePage = Math.min(page, Math.max(Math.ceil(total / limit), 1));
+  let data = result?.data ?? [];
+  if (effectivePage !== page) {
+    [result] = await run((effectivePage - 1) * limit);
+    data = result?.data ?? [];
+  }
+  return toPaginated(data, total, effectivePage, limit);
+};
 
 export const sendValidationError = (res: Response, error: z.ZodError): void => {
   res.status(400).json({ error: "Validation failed", issues: error.issues });

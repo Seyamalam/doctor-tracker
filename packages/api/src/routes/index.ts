@@ -17,6 +17,11 @@ export const createApiRouter = (auth: Auth): Router => {
 
   router.use(createRequireAuth(auth));
 
+  router.use((_req, res, next) => {
+    res.set("Cache-Control", "no-store");
+    next();
+  });
+
   router.get("/me", (req, res) => {
     res.json({ message: "This is private", user: req.session?.user });
   });

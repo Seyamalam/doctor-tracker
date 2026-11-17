@@ -9,11 +9,12 @@ import {
   escapeRegex,
   listQueryFields,
   optionalFilter,
+  paginate,
   parseSort,
   sendValidationError,
   sortParam,
-  toPaginated,
 } from "../lib/listing";
+import { requireAdmin } from "../middleware/require-role";
 import type { PatientWithDoctor } from "../lib/patient-projection";
 
 const SORTABLE_FIELDS = [
@@ -25,6 +26,8 @@ const SORTABLE_FIELDS = [
   "specialization",
   "updatedAt",
 ] as const;
+
+const PATIENT_SORTABLE_FIELDS = ["condition", "createdAt", "name", "updatedAt"] as const;
 
 const listQuerySchema = z.object({
   ...listQueryFields,
@@ -38,6 +41,7 @@ const doctorPatientsQuerySchema = z.object({
   limit: listQueryFields.limit,
   page: listQueryFields.page,
   search: listQueryFields.search,
+  sort: sortParam(PATIENT_SORTABLE_FIELDS),
   to: listQueryFields.to,
 });
 
@@ -117,31 +121,30 @@ doctorsRouter.get(
       match.createdAt = range;
     }
 
-    const [result] = await Doctor.aggregate<{
-      data: DoctorItem[];
-      total: { count: number }[];
-    }>([
-      { $match: match },
-      {
-        $lookup: {
-          as: "patients",
-          foreignField: "doctorId",
-          from: "patient",
-          localField: "id",
+    const result = await paginate<DoctorItem>({
+      dataStages: [doctorProjectStage],
+      limit,
+      model: Doctor,
+      page,
+      stages: [
+        { $match: match },
+        {
+          $lookup: {
+            as: "patients",
+            from: "patient",
+            let: { doctorId: "$id" },
+            pipeline: [
+              { $match: { $expr: { $eq: ["$doctorId", "$$doctorId"] } } },
+              { $count: "count" },
+            ],
+          },
         },
-      },
-      { $addFields: { patientCount: { $size: "$patients" } } },
-      { $sort: parseSort(sort) },
-      {
-        $facet: {
-          data: [{ $skip: (page - 1) * limit }, { $limit: limit }, doctorProjectStage],
-          total: [{ $count: "count" }],
-        },
-      },
-    ]);
+        { $addFields: { patientCount: { $ifNull: [{ $first: "$patients.count" }, 0] } } },
+        { $sort: parseSort(sort) },
+      ],
+    });
 
-    const total = result?.total[0]?.count ?? 0;
-    res.json(toPaginated(result?.data ?? [], total, page, limit));
+    res.json(result);
   }),
 );
 
@@ -159,6 +162,7 @@ doctorsRouter.get(
 
 doctorsRouter.post(
   "/",
+  requireAdmin,
   asyncHandler(async (req, res) => {
     const parsed = createDoctorSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -190,6 +194,7 @@ doctorsRouter.get(
 
 doctorsRouter.patch(
   "/:id",
+  requireAdmin,
   asyncHandler(async (req, res) => {
     const params = idParamsSchema.safeParse(req.params);
     if (!params.success) {
@@ -218,6 +223,7 @@ doctorsRouter.patch(
 
 doctorsRouter.delete(
   "/:id",
+  requireAdmin,
   asyncHandler(async (req, res) => {
     const params = idParamsSchema.safeParse(req.params);
     if (!params.success) {
@@ -247,7 +253,7 @@ doctorsRouter.get(
       sendValidationError(res, parsed.error);
       return;
     }
-    const { condition, from, limit, page, search, to } = parsed.data;
+    const { condition, from, limit, page, search, sort, to } = parsed.data;
 
     const doctor = await Doctor.findOne({ id: params.data.id }).select("-_id -__v").lean();
     if (!doctor) {
@@ -274,34 +280,22 @@ doctorsRouter.get(
       match.createdAt = range;
     }
 
-    const [result] = await Patient.aggregate<{
-      data: Omit<PatientWithDoctor, "doctor">[];
-      total: { count: number }[];
-    }>([
-      { $match: match },
-      { $sort: { createdAt: -1 } },
-      {
-        $facet: {
-          data: [
-            { $skip: (page - 1) * limit },
-            { $limit: limit },
-            { $project: { __v: 0, _id: 0 } },
-          ],
-          total: [{ $count: "count" }],
-        },
-      },
-    ]);
+    const result = await paginate<Omit<PatientWithDoctor, "doctor">>({
+      dataStages: [{ $project: { __v: 0, _id: 0 } }],
+      limit,
+      model: Patient,
+      page,
+      stages: [{ $match: match }, { $sort: parseSort(sort) }],
+    });
 
     const embedded = {
       id: doctor.id,
       name: doctor.name,
       specialization: doctor.specialization,
     };
-    const data = (result?.data ?? []).map((patient) => ({
-      ...patient,
-      doctor: embedded,
-    }));
-    const total = result?.total[0]?.count ?? 0;
-    res.json(toPaginated(data, total, page, limit));
+    res.json({
+      ...result,
+      data: result.data.map((patient) => ({ ...patient, doctor: embedded })),
+    });
   }),
 );
