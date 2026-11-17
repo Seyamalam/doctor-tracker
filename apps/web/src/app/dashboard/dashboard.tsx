@@ -27,7 +27,7 @@ const TEAL = "#14b8a6";
 const SLATE = "#64748b";
 const PIE_COLORS = ["#0d9488", "#0891b2", "#10b981", "#0ea5e9", "#64748b", "#94a3b8"];
 
-const truncateTick = (value: string) => (value.length > 18 ? `${value.slice(0, 17)}…` : value);
+const truncateTick = (value: string) => (value.length > 15 ? `${value.slice(0, 14)}…` : value);
 
 const StatCard = ({
   label,
