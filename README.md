@@ -1,110 +1,146 @@
-# doctor-tracker
+# Doctor Tracker
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines Next.js, Express, TRPC, and more.
+A secure admin app for managing doctors and their patients. Sign in with email/password, land on a live analytics dashboard, and work with fully searchable, filterable, paginated doctor and patient tables — backed by a REST API where every non-health route is behind session auth.
+
+**Live demo:** [doctor-tracker-tau-sage.vercel.app](https://doctor-tracker-tau-sage.vercel.app)
+
+| Dashboard                                            | Doctors                                          | Patients                                           |
+| ---------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------- |
+| ![Dashboard](docs/screenshots/dashboard-desktop.png) | ![Doctors](docs/screenshots/doctors-desktop.png) | ![Patients](docs/screenshots/patients-desktop.png) |
+
+<details>
+<summary>Mobile &amp; tablet views</summary>
+
+![Dashboard mobile](docs/screenshots/dashboard-mobile.png)
+![Doctors mobile](docs/screenshots/doctors-mobile.png)
+![Patients mobile](docs/screenshots/patients-mobile.png)
+![Dashboard tablet](docs/screenshots/dashboard-tablet.png)
+
+</details>
 
 ## Features
 
-- **TypeScript** - For type safety and improved developer experience
-- **Next.js** - Full-stack React framework
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
-- **Express** - Fast, unopinionated web framework
-- **tRPC** - End-to-end type-safe APIs
-- **Node.js** - Runtime environment
-- **Mongoose** - TypeScript-first ORM
-- **MongoDB** - Database engine
-- **Authentication** - Better-Auth
-- **Oxlint** - Oxlint + Oxfmt (linting & formatting)
-- **Vite+** - Unified Vite toolchain, workspace task runner, linting, and formatting
+- **Session auth** — better-auth email/password; httpOnly cookies; every `/api/*` route except `/api/health` requires a session, and all app pages gate server-side before render.
+- **Doctors** — list with search (name/specialization/hospital/email), specialization filter, `createdAt` date range, column sort, pagination; create/edit/delete dialogs; deleting a doctor cascades to their patients.
+- **Doctor detail** — doctor card plus their patient roster with the same filter/search/pagination controls.
+- **Patients** — list with search (name/condition), condition and doctor filters, sort, pagination; each row embeds its doctor and links to the detail page; create/edit/delete with doctor reassignment.
+- **Dashboard** — totals (doctors, patients, new this month), 30-day activity chart, top-5 conditions pie, busiest specializations, recent patients.
+- **Responsive + accessible** — tables scroll safely on mobile, coarse-pointer touch targets, focus-visible rings, `prefers-reduced-motion` support, dark mode.
 
-## Getting Started
+## Tech stack
 
-First, install the dependencies:
+| Layer    | Choice                                                                                      |
+| -------- | ------------------------------------------------------------------------------------------- |
+| Frontend | Next.js 16 (App Router), React 19, Tailwind CSS 4                                           |
+| UI kit   | **ui-sdk** headless components (`@ui-sdk/react`), styled with Tailwind                      |
+| Data     | TanStack Query (server state), TanStack Table, TanStack Form + zod                          |
+| Charts   | Recharts                                                                                    |
+| Backend  | Express 5, zod validation, better-auth                                                      |
+| DB       | MongoDB Atlas + Mongoose                                                                    |
+| Tooling  | npm workspaces, vite-plus (dev/check/test), oxlint + oxfmt (Ultracite), varlock (typed env) |
+
+### Why REST instead of tRPC?
+
+The API is a plain Express REST service mounted at `/api`. tRPC would couple the contract to a TypeScript client generator and to co-location with the web app — this app needs neither: the contract is small and stable, and REST keeps the API usable by non-TypeScript consumers, curl, and the Vercel multi-service deployment where `server` is its own function. zod schemas on both ends provide the safety tRPC would have, without the code-gen step.
+
+### Why TanStack Query for data, and ui-sdk for components?
+
+- **TanStack Query** owns all server state: cache, dedupe, background refetch, optimistic mutations with rollback, and a global 401 → login redirect. Components never call `fetch` directly — everything goes through typed hooks over `apiFetch` in `apps/web/src/lib/api.ts`.
+- **ui-sdk** is the repo's component system: headless primitives (`@ui-sdk/react/*` per-entry imports) styled with Tailwind tokens. It ships real a11y behavior (focus management, ARIA, keyboard nav) without locking the visual design the way a pre-styled kit (shadcn-style defaults) would.
+
+## Architecture
+
+```
+doctor-tracker/                     (npm workspaces)
+├── apps/
+│   ├── web/        Next.js 16 frontend — localhost:3001
+│   │   └── src/
+│   │       ├── app/        dashboard / doctors / doctors/[id] / patients / login
+│   │       ├── components/ tables, dialogs, forms, toolbar, logo
+│   │       └── lib/        api.ts (apiFetch), hooks/, auth-client
+│   └── server/     Express 5 API — localhost:3000 (entry: src/index.ts)
+└── packages/
+    ├── api/        Routers: doctors, patients, stats + shared listing/validation helpers
+    ├── auth/       better-auth config (MongoDB adapter, email/password)
+    └── db/         Mongoose models (doctor, patient, auth), createDb, seed script
+```
+
+Request flow: browser → Next.js pages (server-side session check → `/login` redirect) → client TanStack Query hooks → `apiFetch` → `/api/*` → Express → `createRequireAuth` → zod-validated router → Mongoose → Atlas.
+
+List endpoints share one contract: `?page&limit&search&sort=field:asc|desc&from&to` plus per-resource filters, returning `{ data, total, page, limit, totalPages }`. Errors return `{ error, issues? }` with 400/401/404 semantics (201 create, 204 delete).
+
+## Getting started
 
 ```bash
 npm install
 ```
 
-## Database Setup
+### Environment
 
-This project uses MongoDB with Mongoose.
-
-1. Make sure you have MongoDB set up.
-2. Update your `apps/server/.env` file with your MongoDB connection URI.
-
-Then, run the development server:
+Each app owns a varlock `.env.schema` — copy the examples and fill them in:
 
 ```bash
-npm run dev
+cp apps/server/.env.example apps/server/.env
+cp apps/web/.env.example apps/web/.env
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application. The API is running at [http://localhost:3000](http://localhost:3000).
+`apps/server/.env`:
 
-## UI Customization
+| Key                  | Value                                          |
+| -------------------- | ---------------------------------------------- |
+| `DATABASE_URL`       | MongoDB connection string (`…/doctor_tracker`) |
+| `BETTER_AUTH_SECRET` | Random 32+ char secret                         |
+| `BETTER_AUTH_URL`    | `http://localhost:3000`                        |
+| `CORS_ORIGIN`        | `http://localhost:3001`                        |
+| `NODE_ENV`           | `development`                                  |
 
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
+`apps/web/.env`:
 
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
+| Key                      | Value                   |
+| ------------------------ | ----------------------- |
+| `NEXT_PUBLIC_SERVER_URL` | `http://localhost:3000` |
+| `NODE_ENV`               | `development`           |
 
-### Add more shared components
-
-Run this from the project root to add more primitives to the shared UI package:
+### Seed + run
 
 ```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
+npm run seed -w @doctor-tracker/db   # 15 doctors, 60 patients into Atlas
+npm run dev                          # web :3001 + server :3000
 ```
 
-Import shared components like this:
+Open http://localhost:3001 — you'll be redirected to `/login`; create an account to enter.
 
-```tsx
-import { Button } from "@doctor-tracker/ui/components/button";
+## Testing
+
+```bash
+npm run check    # format + lint + typecheck across workspaces
+npx vp test      # 37 route tests (mongodb-memory-server): auth gate,
+                 # validation, pagination, doctor/patient CRUD, stats
 ```
 
-### Add app-specific blocks
+## Deployment (Vercel services)
 
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
+`vercel.json` deploys both apps as one multi-service project:
 
-## Environment Configuration
+- **`server`** (`apps/server`, Express) — internal except `/api/*`
+- **`web`** (`apps/web`, Next.js) — public on `/(.*)`, with a `SERVER_URL` service binding for server-side auth calls
 
-Each app owns its environment schema in `.env.schema`. Varlock generates `src/env.ts` during installation; run `npm run env:generate` after changing a schema. Commit schemas, and keep secrets in ignored env files or your deployment platform.
+Top-level rewrites route `/api/(.*)` → `server`, everything else → `web`. In production the browser calls **same-origin** `/api` (no CORS), so `NEXT_PUBLIC_SERVER_URL` should be left unset in Vercel. Set on the project: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` = public site URL, `CORS_ORIGIN` = same public URL, `_VARLOCK_ENV_KEY` (varlock build encryption key — `npx varlock generate-key`).
 
-Import the generated `ENV` accessor in application code. Shared database and auth packages receive configuration or initialized clients from the application. See [Varlock's monorepo guide](https://varlock.dev/guides/monorepos/).
+On Vercel the server bypasses varlock at runtime (no CLI in the function bundle) and reads `process.env` directly; locally `varlock/auto-load` still resolves `.env` files.
 
-Bun's automatic env loading is disabled in `bunfig.toml`; the framework integration or server bootstrap loads Varlock. Node deployments must include Varlock and its dependencies alongside the app schema.
-
-Run standalone Node/Bun tools that use Varlock from the owning app directory so they load that app's schema and env files. `env:generate` only generates TypeScript files; it does not initialize environment values in a subsequent command.
-
-## Git Hooks and Formatting
-
-- Optional native Vite+ hooks: `npm run hooks:setup`
-- Docs: [Vite+ commit hooks](https://viteplus.dev/guide/commit-hooks)
-- Run checks: `npm run check`
-
-## Project Structure
+## API surface
 
 ```
-doctor-tracker/
-├── apps/
-│   ├── web/         # Frontend application (Next.js)
-│   └── server/      # Backend API (Express, TRPC)
-├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
-│   ├── api/         # API layer / business logic
-│   ├── auth/        # Authentication configuration & logic
-│   └── db/          # Database schema & queries
+GET  /api/health                      (public)
+GET  /api/me
+/api/doctors                          CRUD + list ?search&specialization&sort&page&limit&from&to
+GET  /api/doctors/specializations
+GET  /api/doctors/:id/patients        scoped list, same filters
+/api/patients                         CRUD + list ?search&condition&doctorId&sort&page&limit&from&to
+GET  /api/patients/conditions
+GET  /api/stats                       dashboard aggregations
+/api/auth/*                           better-auth
 ```
 
-## Available Scripts
-
-- `npm run dev`: Start all applications in development mode
-- `npm run build`: Build all applications
-- `npm run dev:web`: Start only the web application
-- `npm run dev:server`: Start only the server
-- `npm run check-types`: Check TypeScript types across all apps
-- `npm run check`: Run Vite+ format/lint checks and workspace TypeScript checks
-- `npm run lint`: Run Vite+ lint checks
-- `npm run format`: Run Vite+ formatting
-- `npm run staged`: Run Vite+ checks against staged files
-- `npm run hooks:setup`: Install Vite+ native Git hooks with `vp config`
+All except `/api/health` and `/api/auth/*` require a session.
