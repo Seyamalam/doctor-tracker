@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "../index.css";
 import AppShell from "@/components/app-shell";
 import Providers from "@/components/providers";
-import { ENV } from "@/env";
+import { baseUrl } from "@/lib/base-url";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     "express",
     "mongodb",
   ],
-  metadataBase: new URL(ENV.NEXT_PUBLIC_APP_URL || "https://doctor-tracker-tau-sage.vercel.app"),
+  metadataBase: new URL(baseUrl),
   openGraph: {
     description: siteDescription,
     siteName: "Doctor Tracker",
