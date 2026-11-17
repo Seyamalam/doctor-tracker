@@ -4,6 +4,7 @@ import { Button } from "@ui-sdk/react/button";
 import {
   Menu,
   MenuContent,
+  MenuGroup,
   MenuGroupLabel,
   MenuItem,
   MenuSeparator,
@@ -55,9 +56,11 @@ const UserMenu = () => {
         side="bottom"
         sideOffset={4}
       >
-        <MenuGroupLabel className="text-muted-foreground truncate px-2.5 py-1.5 text-sm">
-          {session.user.email}
-        </MenuGroupLabel>
+        <MenuGroup>
+          <MenuGroupLabel className="text-muted-foreground truncate px-2.5 py-1.5 text-sm">
+            {session.user.email}
+          </MenuGroupLabel>
+        </MenuGroup>
         <MenuSeparator className="bg-border my-1 h-px" />
         <MenuItem className={cx(menuItemCls, "text-danger")} value="sign-out">
           <LogOut className="h-3.5 w-3.5" />
