@@ -1,17 +1,20 @@
+"use client";
+
 import { useForm } from "@tanstack/react-form";
 import { Button } from "@ui-sdk/react/button";
-import { Field, FieldLabel } from "@ui-sdk/react/field";
-import { Input } from "@ui-sdk/react/input";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { TextField } from "@/components/form-fields";
+import { btn, cx, Skeleton } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 
-import Loader from "./loader";
-
-const inputClass =
-  "w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-900";
+const signUpSchema = z.object({
+  email: z.email("Invalid email address"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
 
 const SignUpForm = ({ onSwitchToSignIn }: { onSwitchToSignIn: () => void }) => {
   const router = useRouter();
@@ -36,131 +39,73 @@ const SignUpForm = ({ onSwitchToSignIn }: { onSwitchToSignIn: () => void }) => {
           },
           onSuccess: () => {
             router.push("/dashboard");
-            toast.success("Sign up successful");
+            toast.success("Account created");
           },
-        }
+        },
       );
     },
     validators: {
-      onSubmit: z.object({
-        email: z.email("Invalid email address"),
-        name: z.string().min(2, "Name must be at least 2 characters"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
-      }),
+      onSubmit: signUpSchema,
     },
   });
 
   if (isPending) {
-    return <Loader />;
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-14 w-full" />
+        <Skeleton className="h-14 w-full" />
+        <Skeleton className="h-14 w-full" />
+        <Skeleton className="h-9 w-full" />
+      </div>
+    );
   }
 
   return (
-    <div className="mx-auto mt-10 w-full max-w-md p-6">
-      <h1 className="mb-6 text-center text-3xl font-bold">Create Account</h1>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
-        }}
-        className="space-y-4"
+    <form
+      className="space-y-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      <form.Field name="name" validators={{ onChange: signUpSchema.shape.name }}>
+        {(field) => <TextField autoComplete="name" field={field} label="Name" />}
+      </form.Field>
+      <form.Field name="email" validators={{ onChange: signUpSchema.shape.email }}>
+        {(field) => <TextField autoComplete="email" field={field} label="Email" type="email" />}
+      </form.Field>
+      <form.Field name="password" validators={{ onChange: signUpSchema.shape.password }}>
+        {(field) => (
+          <TextField autoComplete="new-password" field={field} label="Password" type="password" />
+        )}
+      </form.Field>
+      <form.Subscribe
+        selector={(state) => ({
+          canSubmit: state.canSubmit,
+          isSubmitting: state.isSubmitting,
+        })}
       >
-        <div>
-          <form.Field name="name">
-            {(field) => (
-              <Field>
-                <FieldLabel>Name</FieldLabel>
-                <Input
-                  className={inputClass}
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={(value) => field.handleChange(value)}
-                  value={field.state.value}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </Field>
-            )}
-          </form.Field>
-        </div>
-
-        <div>
-          <form.Field name="email">
-            {(field) => (
-              <Field>
-                <FieldLabel>Email</FieldLabel>
-                <Input
-                  className={inputClass}
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={(value) => field.handleChange(value)}
-                  type="email"
-                  value={field.state.value}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </Field>
-            )}
-          </form.Field>
-        </div>
-
-        <div>
-          <form.Field name="password">
-            {(field) => (
-              <Field>
-                <FieldLabel>Password</FieldLabel>
-                <Input
-                  className={inputClass}
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={(value) => field.handleChange(value)}
-                  type="password"
-                  value={field.state.value}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </Field>
-            )}
-          </form.Field>
-        </div>
-
-        <form.Subscribe
-          selector={(state) => ({
-            canSubmit: state.canSubmit,
-            isSubmitting: state.isSubmitting,
-          })}
-        >
-          {({ canSubmit, isSubmitting }) => (
-            <Button
-              className="w-full rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-700 disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-300"
-              disabled={!canSubmit || isSubmitting}
-              type="submit"
-            >
-              {isSubmitting ? "Submitting..." : "Sign Up"}
-            </Button>
-          )}
-        </form.Subscribe>
-      </form>
-
-      <div className="mt-4 text-center">
-        <Button
-          className="text-indigo-600 hover:text-indigo-800"
+        {({ canSubmit, isSubmitting }) => (
+          <Button
+            className={cx(btn.primary, "w-full")}
+            disabled={!canSubmit || isSubmitting}
+            type="submit"
+          >
+            {isSubmitting ? "Creating account…" : "Sign Up"}
+          </Button>
+        )}
+      </form.Subscribe>
+      <p className="text-muted-foreground text-center text-[13px]">
+        <button
+          className="text-primary font-medium hover:underline"
           onClick={onSwitchToSignIn}
+          type="button"
         >
-          Already have an account? Sign In
-        </Button>
-      </div>
-    </div>
+          Already have an account? Sign in
+        </button>
+      </p>
+    </form>
   );
 };
 
