@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import { authClient } from "@/lib/auth-client";
 
-import Dashboard from "./dashboard";
+import Dashboard, { DashboardSkeleton } from "./dashboard";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
 
 const DashboardPage = async () => {
   const session = await authClient.getSession({
@@ -18,11 +24,9 @@ const DashboardPage = async () => {
   }
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome {session.user.name}</p>
-      <Dashboard session={session} />
-    </div>
+    <Suspense fallback={<DashboardSkeleton />}>
+      <Dashboard name={session.user.name} />
+    </Suspense>
   );
 };
 
